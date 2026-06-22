@@ -7,6 +7,7 @@ import lombok.Getter;
 import io.github.ctimetbukii.simpleterminal.annotations.CommandProcessor;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
+import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ConfigurationBuilder;
 
@@ -62,7 +63,8 @@ public class Terminal {
         //从锚定类路径中查找带有注解标记的方法/类
         Reflections reflections = new Reflections(new ConfigurationBuilder()
                 .forPackages(options.getAnchorPackagePath())
-                .setScanners(new TypeAnnotationsScanner(), new MethodAnnotationsScanner()));
+                .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner(false), new MethodAnnotationsScanner()));
+
         Set<Class<?>> commandProcessors = reflections.getTypesAnnotatedWith(CommandProcessor.class);
 
         //注册命令处理器
@@ -122,18 +124,20 @@ public class Terminal {
                     //存在上下文，检查当前已经使用的上下文输入次数
                     if (contextTimes != contextLengthMap.get(contextCommand)) {
                         //上下文次数没有达到记录的最大上下文次数。说明当前仍然存在于上下文环境中。
+                        contextTimes ++;
                         //走上下文指令处理器
                         //检查命令是否存在
                         if (strictMatchCommandHandlers.containsKey(contextCommand)) {
                             strictMatchCommandHandlers.get(contextCommand).accept(inputs, contextTimes); //走上下文时，整个输入被传入当作参数
+                            continue; //当前的上下文指令已经处理完，走下一次while循环，避免跳出if块后继续执行剩下代码导致同一个命令被处理两次
                         } else if (easeMatchCommandHandlers.containsKey(contextCommand.toLowerCase())) {
                             easeMatchCommandHandlers.get(contextCommand.toLowerCase()).accept(inputs, contextTimes);
+                            continue;
                         } else {
                             //命令不存在
                             //上下文指令不应该不存在。此处出现无法调和的异常
                             throw new IllogicalPanicException("ContextCommand doesn't exists while 'contextCommand' field is NOT null!");
                         }
-                        contextTimes ++;
                     } else {
                         //上下文次数已经达到记录的最大次数。证明此时已经完成上下文命令的上下文。我们清空上下文
                         contextTimes = -1;
@@ -142,6 +146,7 @@ public class Terminal {
                     }
                 }
 
+                //当前不存在上下文，正常执行
                 //拿到顶部命令
                 String topCommand = inputs[0];
                 String[] args = Arrays.copyOfRange(inputs, 1, inputs.length);

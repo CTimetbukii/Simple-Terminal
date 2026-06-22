@@ -69,7 +69,7 @@ public class TerminalOptions {
     @Getter
     @Setter
     private Consumer<String> commandDoesntExistProcessor = cmd -> {
-        byte[] warningBytes = ("Command '" + cmd + "' doesn't exists.").getBytes();
+        byte[] warningBytes = ("Command '" + cmd + "' doesn't exists.\n").getBytes();
         try {
             getOutputStream().write(warningBytes);
         } catch (IOException e) {

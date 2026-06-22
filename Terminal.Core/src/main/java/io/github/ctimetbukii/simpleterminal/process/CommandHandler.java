@@ -63,6 +63,7 @@ public class CommandHandler implements ICommandProcessor {
     @Override
     public void accept(String[] args, int contextStage) {
         //检查上下文阶段是否符合要求
-
+        System.out.println(Arrays.toString(args));
+        System.out.println(contextStage);
     }
 }

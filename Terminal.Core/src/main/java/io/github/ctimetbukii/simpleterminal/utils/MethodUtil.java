@@ -39,7 +39,7 @@ public class MethodUtil {
 
     public static CommandSign makeSubCommandExecutorCommandSign(Method method) {
         SubCommandExecutor executor = method.getAnnotation(SubCommandExecutor.class);
-        return new CommandSign(executor.patterns(), executor.types(), 0);
+        return new CommandSign(executor.value(), executor.patterns(), executor.types(), 0);
     }
 
     public static CommandSign makeContextExecutorCommandSign(Method method) {

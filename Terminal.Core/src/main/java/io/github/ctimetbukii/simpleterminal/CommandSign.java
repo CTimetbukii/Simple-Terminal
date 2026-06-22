@@ -3,11 +3,14 @@ package io.github.ctimetbukii.simpleterminal;
 import lombok.Getter;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * 用于区分一个CommandExecutor标记的方法和另一个CommandExecutor标记的方法的Sign。
  */
 public class CommandSign {
+    @Getter
+    private String commandValue;
     @Getter
     private String[] patterns;
     @Getter
@@ -16,6 +19,11 @@ public class CommandSign {
     private int stage = 0;
 
     public CommandSign(String[] patterns, Class<?>[] types, int stage) {
+        this("", patterns, types, stage);
+    }
+
+    public CommandSign(String commandValue, String[] patterns, Class<?>[] types, int stage) {
+        this.commandValue = commandValue;
         this.patterns = patterns;
         this.types = types;
         this.stage = stage;
@@ -25,7 +33,10 @@ public class CommandSign {
     public boolean equals(Object obj) {
         if (obj instanceof CommandSign) {
             CommandSign sign = (CommandSign) obj;
-            return Arrays.equals(sign.patterns, this.patterns) && Arrays.equals(sign.types, this.types) && sign.stage == this.stage;
+            return Objects.equals(sign.commandValue, this.commandValue)
+                    && Arrays.equals(sign.patterns, this.patterns)
+                    && Arrays.equals(sign.types, this.types)
+                    && sign.stage == this.stage;
         } else {
             return super.equals(obj);
         }
@@ -33,6 +44,9 @@ public class CommandSign {
 
     @Override
     public int hashCode() {
-        return Arrays.hashCode(patterns) + Arrays.hashCode(types) + this.stage;
+        return Objects.hashCode(commandValue)
+                + Arrays.hashCode(patterns)
+                + Arrays.hashCode(types)
+                + this.stage;
     }
 }

@@ -2,15 +2,17 @@ package io.github.ctimetbukii.simpleterminal.process;
 
 import io.github.ctimetbukii.simpleterminal.CommandSign;
 import io.github.ctimetbukii.simpleterminal.annotations.CommandExecutor;
+import io.github.ctimetbukii.simpleterminal.annotations.ContextCommandExecutor;
 import io.github.ctimetbukii.simpleterminal.annotations.SubCommandExecutor;
 import io.github.ctimetbukii.simpleterminal.exceptions.RepeatCommandSignException;
 import lombok.Getter;
+import org.jboss.resteasy.util.TypeConverter;
 
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.stream.Collectors;
 
-import static io.github.ctimetbukii.simpleterminal.utils.MethodUtil.makeCommandExecutorCommandSign;
-import static io.github.ctimetbukii.simpleterminal.utils.MethodUtil.makeSubCommandExecutorCommandSign;
+import static io.github.ctimetbukii.simpleterminal.utils.MethodUtil.*;
 
 public class CommandHandler implements ICommandProcessor {
     //命令与Method的映射
@@ -19,10 +21,19 @@ public class CommandHandler implements ICommandProcessor {
     //子命令与Method的映射
     private final HashMap<CommandSign, Method> subCommandExecutors = new HashMap<>();
 
+    //上下文命令与Method的映射
+    private final HashMap<CommandSign, Method> contextCommandExecutors = new HashMap<>();
+
     //上下文长度
     @Getter
     private final int contextLength;
 
+    /**
+     * 为某个指令处理类构造一个CommandHandler中间层。若该类不处理上下文指令，则contextLength必须传入0。
+     * 若有上下文指令，则传入该类中ContextCommandExecutor标记的最大stage。
+     * @param cls 指令处理类
+     * @param contextLength 类中的最大stage。若类不处理上下文指令，必须传入0
+     */
     public CommandHandler(Class<?> cls, int contextLength) {
         Method[] methods = cls.getMethods();
 
@@ -48,6 +59,14 @@ public class CommandHandler implements ICommandProcessor {
                 }
                 subCommandExecutors.put(sign, method);
             }
+
+            if (method.isAnnotationPresent(ContextCommandExecutor.class)) {
+                sign = makeContextExecutorCommandSign(method);
+                if (contextCommandExecutors.containsKey(sign)) {
+                    throw new RepeatCommandSignException(cls);
+                }
+                contextCommandExecutors.put(sign, method);
+            }
         }
     }
 
@@ -63,7 +82,20 @@ public class CommandHandler implements ICommandProcessor {
     @Override
     public void accept(String[] args, int contextStage) {
         //检查上下文阶段是否符合要求
-        System.out.println(Arrays.toString(args));
-        System.out.println(contextStage);
+        if (contextLength != 0) {
+            //存在上下文指令。通过contextStage查找CommandSign
+            Set<CommandSign> signs = contextCommandExecutors.keySet().stream()
+                    .filter(cSign -> cSign.getStage() == contextStage)
+                    .collect(Collectors.toSet());
+            //挨个对比CommandSign，寻找能匹配的上的
+            for (CommandSign sign : signs) {
+                //匹配Types，若sign中标记为空，则跳过匹配
+                if (sign.getTypes().length != 0) {
+                    //不为空，匹配Types
+
+                }
+            }
+
+        }
     }
 }

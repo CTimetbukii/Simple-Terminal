@@ -24,9 +24,4 @@ public @interface SubCommandExecutor {
      * 方法参数应当遵循的格式要求，使用正则表达式编写，依次按位置表示每个位置的参数格式。默认为空，即不作格式要求
      */
     String[] patterns() default {};
-
-    /**
-     * 方法参数应当遵循的类型要求，依次按位置表示每个位置的参数类型。默认为空，即不作类型要求
-     */
-    Class<?>[] types() default {};
 }

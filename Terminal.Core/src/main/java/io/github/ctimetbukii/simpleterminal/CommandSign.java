@@ -14,18 +14,15 @@ public class CommandSign {
     @Getter
     private String[] patterns;
     @Getter
-    private Class<?>[] types;
-    @Getter
     private int stage = 0;
 
-    public CommandSign(String[] patterns, Class<?>[] types, int stage) {
-        this("", patterns, types, stage);
+    public CommandSign(String[] patterns, int stage) {
+        this("", patterns, stage);
     }
 
-    public CommandSign(String commandValue, String[] patterns, Class<?>[] types, int stage) {
+    public CommandSign(String commandValue, String[] patterns, int stage) {
         this.commandValue = commandValue;
         this.patterns = patterns;
-        this.types = types;
         this.stage = stage;
     }
 
@@ -35,7 +32,6 @@ public class CommandSign {
             CommandSign sign = (CommandSign) obj;
             return Objects.equals(sign.commandValue, this.commandValue)
                     && Arrays.equals(sign.patterns, this.patterns)
-                    && Arrays.equals(sign.types, this.types)
                     && sign.stage == this.stage;
         } else {
             return super.equals(obj);
@@ -46,7 +42,6 @@ public class CommandSign {
     public int hashCode() {
         return Objects.hashCode(commandValue)
                 + Arrays.hashCode(patterns)
-                + Arrays.hashCode(types)
                 + this.stage;
     }
 }

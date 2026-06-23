@@ -34,9 +34,4 @@ public @interface ContextCommandExecutor {
      * 参见 {@link CommandExecutor#patterns()}
      */
     String[] patterns() default {};
-
-    /**
-     * 参见 {@link CommandExecutor#types()}
-     */
-    Class<?>[] types() default {};
 }

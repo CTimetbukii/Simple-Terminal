@@ -34,17 +34,17 @@ public class MethodUtil {
 
     public static CommandSign makeCommandExecutorCommandSign(Method method) {
         CommandExecutor executor = method.getAnnotation(CommandExecutor.class);
-        return new CommandSign(executor.patterns(), executor.types(), 0);
+        return new CommandSign(executor.patterns(), 0);
     }
 
     public static CommandSign makeSubCommandExecutorCommandSign(Method method) {
         SubCommandExecutor executor = method.getAnnotation(SubCommandExecutor.class);
-        return new CommandSign(executor.value(), executor.patterns(), executor.types(), 0);
+        return new CommandSign(executor.value(), executor.patterns(), 0);
     }
 
     public static CommandSign makeContextExecutorCommandSign(Method method) {
         ContextCommandExecutor executor = method.getAnnotation(ContextCommandExecutor.class);
-        return new CommandSign(executor.patterns(), executor.types(), executor.stage());
+        return new CommandSign(executor.patterns(), executor.stage());
     }
 }
 

@@ -6,9 +6,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 当传入的命令参数不符合要求的正则表达式时，走该注解标记的方法。
+ * 当传入的命令参数不符合要求时，走该注解标记的方法。
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ArgsPatternsIllegalExecutor {
+public @interface ArgsIllegalExecutor {
 }

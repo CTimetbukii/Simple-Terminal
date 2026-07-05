@@ -5,7 +5,7 @@ import io.github.ctimetbukii.simpleterminal.annotations.CommandProcessor;
 
 @CommandProcessor("greet")
 public class GreetCommandProcessor {
-    @CommandExecutor(types = {String.class})
+    @CommandExecutor
     public void greet(String user) {
         System.out.println("Hello, " + user);
     }

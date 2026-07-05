@@ -88,9 +88,9 @@ public class Terminal {
             contextLengthMap.put(processorAnn.value().toLowerCase(), contextLength);
 
             if (processorAnn.matchUpperAndLowerCase()) {
-                easeMatchCommandHandlers.put(processorAnn.value().toLowerCase(), new CommandHandler(cls, contextLength));
+                easeMatchCommandHandlers.put(processorAnn.value().toLowerCase(), new CommandHandler(cls, contextLength, options.getOutputStream()));
             } else {
-                strictMatchCommandHandlers.put(processorAnn.value(), new CommandHandler(cls, contextLength));
+                strictMatchCommandHandlers.put(processorAnn.value(), new CommandHandler(cls, contextLength, options.getOutputStream()));
             }
             //处理含有上下文的指令
             if (processorAnn.hasContext()) {

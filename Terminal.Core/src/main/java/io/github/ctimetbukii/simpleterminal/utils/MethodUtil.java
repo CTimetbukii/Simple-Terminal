@@ -20,18 +20,6 @@ public class MethodUtil {
         return method.getAnnotation(ContextCommandExecutor.class).patterns();
     }
 
-    public static Class<?>[] getCommandExecutorTypes(Method method) {
-        return method.getAnnotation(CommandExecutor.class).types();
-    }
-
-    public static Class<?>[] getSubCommandExecutorTypes(Method method) {
-        return method.getAnnotation(SubCommandExecutor.class).types();
-    }
-
-    public static Class<?>[] getContextCommandExecutorTypes(Method method) {
-        return method.getAnnotation(ContextCommandExecutor.class).types();
-    }
-
     public static CommandSign makeCommandExecutorCommandSign(Method method) {
         CommandExecutor executor = method.getAnnotation(CommandExecutor.class);
         return new CommandSign(executor.patterns(), 0);

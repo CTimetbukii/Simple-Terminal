@@ -55,6 +55,13 @@ public class TerminalOptions {
     private OutputStream outputStream = System.out;
 
     /**
+     * 终端错误输出流
+     */
+    @Getter
+    @Setter
+    private OutputStream errOutputStream = System.err;
+
+    /**
      * 用于锚定命令处理器的包路径。例如，若将带有CommandExecutorMethod的方法的类放在com.example下，则该值应当为com.example。
      * 这表明Simple-Terminal将从com.example包下开始扫描有无带有相关注解的类/方法。该值不得为null
      */
@@ -71,7 +78,7 @@ public class TerminalOptions {
     private Consumer<String> commandDoesntExistProcessor = cmd -> {
         byte[] warningBytes = ("Command '" + cmd + "' doesn't exists.\n").getBytes();
         try {
-            getOutputStream().write(warningBytes);
+            getErrOutputStream().write(warningBytes);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

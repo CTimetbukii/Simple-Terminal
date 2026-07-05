@@ -32,9 +32,9 @@
             <version>0.9.12</version>
         </dependency>
         <dependency>
-            <groupId>org.jboss.resteasy</groupId>
-            <artifactId>resteasy-core</artifactId>
-            <version>7.0.2.Final</version> <!-- 请使用最新稳定版本 -->
+            <groupId>io.github.ctimetbukii</groupId>
+            <artifactId>elegant-convert-checker-core</artifactId>
+            <version>0.0.1</version>
         </dependency>
     </dependencies>
 

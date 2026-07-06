@@ -34,4 +34,11 @@ public @interface ContextCommandExecutor {
      * 参见 {@link CommandExecutor#patterns()}
      */
     String[] patterns() default {};
+
+    /**
+     * 是否启用参数拼接。所谓参数拼接即将参数与空格拼接起来作为一个参数传入方法。例如执行指令 cmd 1 2 3，
+     * 启用参数拼接后，传入的参数将从 {"1","2","3"} 变为 {"1 2 3"}。当你认为用户输入的内容中需要包含空格时，启用参数拼接。
+     * 默认为不启用。
+     */
+    boolean paraJoin() default false;
 }

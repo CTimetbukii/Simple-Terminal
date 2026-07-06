@@ -8,6 +8,7 @@ public interface ICommandProcessor {
      *             若该指令hasContext=false，则此处传入{"1","2","3"} 。 <br/>
      *             此时子命令被视为命令参数。
      * @param contextStage 上下文阶段。对于没有上下文的指令，该值可以忽略
+     * @return 是否正常执行。当出现参数不合法等问题时，返回false。否则返回true
      */
-    public void accept(String[] args, int contextStage);
+    public boolean accept(String[] args, int contextStage);
 }

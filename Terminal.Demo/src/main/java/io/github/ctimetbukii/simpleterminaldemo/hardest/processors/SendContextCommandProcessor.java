@@ -16,7 +16,7 @@ public class SendContextCommandProcessor {
     /*
      *
      */
-    @ContextCommandExecutor(stage = 1)
+    @ContextCommandExecutor(stage = 1, paraJoin = true) //paraJoin =true处理用户名中包含空格的情况
     public void acceptUser(String user) {
         System.out.println("Send to '" + user + "' done.");
         System.out.println("Your feeling rate: ");
@@ -24,6 +24,6 @@ public class SendContextCommandProcessor {
 
     @ContextCommandExecutor(stage = 2)
     public void acceptUserFeelingRate(int rate) {
-
+        System.out.println("Rate = " + rate);
     }
 }

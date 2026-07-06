@@ -6,7 +6,7 @@ import io.github.ctimetbukii.simpleterminal.annotations.CommandExecutor;
 import io.github.ctimetbukii.simpleterminal.annotations.ContextCommandExecutor;
 import io.github.ctimetbukii.simpleterminal.annotations.SubCommandExecutor;
 import io.github.ctimetbukii.simpleterminal.exceptions.RepeatCommandSignException;
-import io.github.ctimetbukii.simpleterminal.utils.PatternsUtil;
+import io.github.ctimetbukii.simpleterminal.utils.CastUtil;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
@@ -41,9 +41,10 @@ public class CommandHandler implements ICommandProcessor {
     /**
      * 为某个指令处理类构造一个CommandHandler中间层。若该类不处理上下文指令，则contextLength必须传入0。
      * 若有上下文指令，则传入该类中ContextCommandExecutor标记的最大stage。
-     * @param cls 指令处理类
+     *
+     * @param cls           指令处理类
      * @param contextLength 类中的最大stage。若类不处理上下文指令，必须传入0
-     * @param output 输出流，用于执行一些默认行为
+     * @param output        输出流，用于执行一些默认行为
      */
     @SneakyThrows
     public CommandHandler(Class<?> cls, int contextLength, OutputStream output) {
@@ -101,34 +102,84 @@ public class CommandHandler implements ICommandProcessor {
      */
     @SneakyThrows
     @Override
-    public void accept(String[] args, int contextStage) {
-        //检查上下文阶段是否符合要求
-        if (contextLength != 0) {
-            //存在上下文指令。通过contextStage查找CommandSign
-            Set<CommandSign> signs = contextCommandExecutors.keySet().stream()
-                    .filter(cSign -> cSign.getStage() == contextStage) //匹配上下文阶段
-                    .filter(cSign -> PatternsUtil.match(args, cSign.getPatterns())) //匹配patterns
+    public boolean accept(String[] args, int contextStage) {
+        Set<CommandSign> signs;
+        HashMap<CommandSign, Method> executorMap;
+        boolean isSubCommandRegistered = false;
+
+        if (contextLength != 0 && contextStage != 0) { //contextStage = 0时，走正常的commandExecutor
+            signs = contextCommandExecutors.keySet().stream()
+                    .filter(cSign -> cSign.getStage() == contextStage)
+                    .filter(cSign -> cSign.isMatchTypes(args))
+                    .filter(cSign -> cSign.isMatchPatterns(args))
                     .collect(Collectors.toSet());
-
-            //检查是否为空
-            if (signs.isEmpty()) {
-                //为空说明没有符合条件的CommandExecutor，传入 参数错误 命令处理器
-                if (argsIllegalExecutor != null) {
-                    argsIllegalExecutor.invoke(invokeObj, (Object[]) args);
-                } else {
-                    //参数错误命令处理器此时未定义，执行默认行为
-                    outputStream.write("Command args are illegal!".getBytes());
-                }
+            executorMap = contextCommandExecutors;
+        } else if ((!subCommandExecutors.isEmpty()) && args.length != 0) { //说明存在子命令，且输入中有能够被视为子命令的东西，检查子命令匹配
+            //子命令
+            String subCommand = args[0];
+            //检查该子命令是否被注册
+            isSubCommandRegistered = subCommandExecutors.keySet().stream().anyMatch(cSign -> cSign.getCommandValue().equals(subCommand));
+            if (isSubCommandRegistered) {
+                //已经被注册，走子命令通道
+                //截断args
+                String[] subArgs = Arrays.copyOfRange(args, 1, args.length);
+                signs = subCommandExecutors.keySet().stream()
+                        .filter(cSign -> cSign.getCommandValue().equals(subCommand))
+                        .filter(cSign -> cSign.isMatchTypes(subArgs))
+                        .filter(cSign -> cSign.isMatchPatterns(subArgs))
+                        .collect(Collectors.toSet());
+                executorMap = subCommandExecutors;
             } else {
-                //不为空，说明匹配到了对应的CommandSign.
-                //这里的值只可能是一个，因为我们早做了CommandSign去重
-                CommandSign sign = signs.iterator().next();
-                //取出对应的Method，执行
-                contextCommandExecutors.get(sign).invoke(invokeObj, (Object[]) args);
+                //没有被注册相关的子命令。这个时候，走普通的commandExecutor通道
+                signs = commandExecutors.keySet().stream()
+                        .filter(cSign -> cSign.isMatchTypes(args))
+                        .filter(cSign -> cSign.isMatchPatterns(args))
+                        .collect(Collectors.toSet());
+                executorMap = commandExecutors;
             }
-
         } else {
-            //不存在上下文指令，
+            signs = commandExecutors.keySet().stream()
+                    .filter(cSign -> cSign.isMatchTypes(args))
+                    .filter(cSign -> cSign.isMatchPatterns(args))
+                    .collect(Collectors.toSet());
+            executorMap = commandExecutors;
+            //这两块代码重复了。我知道这很丑，但是没关系，它能跑
         }
+
+        //检查是否为空
+        if (signs.isEmpty()) {
+            //为空说明没有符合条件的CommandExecutor，传入 参数错误 命令处理器
+            if (argsIllegalExecutor != null) {
+                argsIllegalExecutor.invoke(invokeObj, (Object[]) args);
+            } else {
+                //参数错误命令处理器此时未定义，执行默认行为
+                outputStream.write("Command args are illegal!\n".getBytes());
+            }
+            return false;
+        } else {
+            //不为空，说明匹配到了对应的CommandSign.
+            //这里的值只可能是一个，因为我们早做了CommandSign去重
+            CommandSign sign = signs.iterator().next();
+            //检查是否要求进行参数拼接
+            if (sign.isParaJoin()) {
+                //进行参数拼接后传入
+                String para;
+                //取出对应的Method，执行
+                if (isSubCommandRegistered) {
+                    para = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
+                } else {
+                    para = String.join(" ", args);
+                }
+                executorMap.get(sign).invoke(invokeObj, para);
+            } else {
+                //不要求参数拼接
+                if (isSubCommandRegistered) {
+                    executorMap.get(sign).invoke(invokeObj, CastUtil.castArgs(Arrays.copyOfRange(args, 1, args.length), sign.getParaTypes()));
+                } else {
+                    executorMap.get(sign).invoke(invokeObj, CastUtil.castArgs(args, sign.getParaTypes()));
+                }
+            }
+        }
+        return true;
     }
 }

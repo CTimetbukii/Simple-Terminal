@@ -127,17 +127,25 @@ public class Terminal {
                         contextTimes ++;
                         //走上下文指令处理器
                         //检查命令是否存在
+                        boolean result;
+
                         if (strictMatchCommandHandlers.containsKey(contextCommand)) {
-                            strictMatchCommandHandlers.get(contextCommand).accept(inputs, contextTimes); //走上下文时，整个输入被传入当作参数
-                            continue; //当前的上下文指令已经处理完，走下一次while循环，避免跳出if块后继续执行剩下代码导致同一个命令被处理两次
+                            result = strictMatchCommandHandlers.get(contextCommand).accept(inputs, contextTimes); //走上下文时，整个输入被传入当作参数
                         } else if (easeMatchCommandHandlers.containsKey(contextCommand.toLowerCase())) {
-                            easeMatchCommandHandlers.get(contextCommand.toLowerCase()).accept(inputs, contextTimes);
-                            continue;
+                            result = easeMatchCommandHandlers.get(contextCommand.toLowerCase()).accept(inputs, contextTimes);
                         } else {
                             //命令不存在
                             //上下文指令不应该不存在。此处出现无法调和的异常
                             throw new IllogicalPanicException("ContextCommand doesn't exists while 'contextCommand' field is NOT null!");
                         }
+
+                        //检查执行结果。若执行出现参数问题，应当认为此次命令执行失败，清空上下文
+                        if (!result) {
+                            contextTimes = -1;
+                            contextCommand = null;
+                        }
+
+                        continue; //当前的上下文指令已经处理完，走下一次while循环，避免跳出if块后继续执行剩下代码导致同一个命令被处理两次
                     } else {
                         //上下文次数已经达到记录的最大次数。证明此时已经完成上下文命令的上下文。我们清空上下文
                         contextTimes = -1;
@@ -158,14 +166,23 @@ public class Terminal {
                     contextCommand = topCommand;
                     contextTimes ++;
                 }
+
+                boolean result;
+
                 //检查命令是否存在
                 if (strictMatchCommandHandlers.containsKey(topCommand)) {
-                    strictMatchCommandHandlers.get(topCommand).accept(args, contextTimes);
+                    result = strictMatchCommandHandlers.get(topCommand).accept(args, contextTimes);
                 } else if (easeMatchCommandHandlers.containsKey(topCommand.toLowerCase())) {
-                    easeMatchCommandHandlers.get(topCommand.toLowerCase()).accept(args, contextTimes);
+                    result = easeMatchCommandHandlers.get(topCommand.toLowerCase()).accept(args, contextTimes);
                 } else {
                     //命令不存在
                     options.getCommandDoesntExistProcessor().accept(topCommand);
+                    result = false;
+                }
+
+                if (!result) {
+                    contextTimes = -1;
+                    contextCommand = null;
                 }
             }
         }

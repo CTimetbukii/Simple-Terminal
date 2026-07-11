@@ -1,6 +1,6 @@
 package io.github.ctimetbukii.simpleterminal;
 
-import io.github.ctimetbukii.elegantconvertchecker.ConvertChecker;
+import io.github.ctimetbukii.simpleterminal.utils.transform.*;
 import lombok.Getter;
 
 import java.util.Arrays;
@@ -21,17 +21,43 @@ public class CommandSign {
     private int stage = 0;
     @Getter
     private boolean paraJoin;
+    @Getter
+    private final TransformExecutor transformExecutor;
 
-    public CommandSign(String[] patterns, Class<?>[] paraTypes, int stage, boolean paraJoin) {
-        this("", patterns, paraTypes, stage, paraJoin);
+    public CommandSign(String[] patterns,
+                       Class<?>[] paraTypes,
+                       int stage,
+                       boolean paraJoin,
+                       ArgsTypeTransformMethod transformMethod) {
+        this("", patterns, paraTypes, stage, paraJoin, transformMethod);
     }
 
-    public CommandSign(String commandValue, String[] patterns, Class<?>[] paraTypes, int stage, boolean paraJoin) {
+    public CommandSign(String commandValue,
+                       String[] patterns,
+                       Class<?>[] paraTypes,
+                       int stage,
+                       boolean paraJoin,
+                       ArgsTypeTransformMethod transformMethod) {
         this.commandValue = commandValue;
         this.patterns = patterns;
         this.paraTypes = paraTypes;
         this.stage = stage;
         this.paraJoin = paraJoin;
+
+        switch (transformMethod) {
+            case CONVERT:
+                transformExecutor = new ConvertExecutor();
+                break;
+            case COERCE:
+                transformExecutor = new CoerceExecutor();
+                break;
+            case INTERPRET:
+                transformExecutor = new InterpretExecutor();
+                break;
+            default: //COERCE_WITH_INTERPRET
+                transformExecutor = new CoerceOrInterpretExecutor();
+                break;
+        }
     }
 
     @Override
@@ -84,7 +110,7 @@ public class CommandSign {
 
         //逐个校验参数
         for (int i = 0; i < args.length; i++) {
-            if (!ConvertChecker.isConvertible(args[i], paraTypes[i])) {
+            if (!transformExecutor.checkTransformable(args[i], paraTypes[i])) {
                 //若对应位置参数无法被转换，则返回false
                 return false;
             }

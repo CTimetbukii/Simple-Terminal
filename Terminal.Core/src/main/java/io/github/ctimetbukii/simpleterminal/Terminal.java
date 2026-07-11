@@ -1,8 +1,11 @@
 package io.github.ctimetbukii.simpleterminal;
 
 import io.github.ctimetbukii.simpleterminal.annotations.ContextCommandExecutor;
+import io.github.ctimetbukii.simpleterminal.exceptions.IllegalJumpStageException;
 import io.github.ctimetbukii.simpleterminal.exceptions.IllogicalPanicException;
 import io.github.ctimetbukii.simpleterminal.process.CommandHandler;
+import io.github.ctimetbukii.simpleterminal.process.ExecuteResult;
+import io.github.ctimetbukii.simpleterminal.process.ExecuteState;
 import lombok.Getter;
 import io.github.ctimetbukii.simpleterminal.annotations.CommandProcessor;
 import org.reflections.Reflections;
@@ -126,9 +129,10 @@ public class Terminal {
                         //上下文次数没有达到记录的最大上下文次数。说明当前仍然存在于上下文环境中。
                         contextTimes ++;
                         //走上下文指令处理器
-                        //检查命令是否存在
-                        boolean result;
 
+                        ExecuteResult result;
+
+                        //检查命令是否存在
                         if (strictMatchCommandHandlers.containsKey(contextCommand)) {
                             result = strictMatchCommandHandlers.get(contextCommand).accept(inputs, contextTimes); //走上下文时，整个输入被传入当作参数
                         } else if (easeMatchCommandHandlers.containsKey(contextCommand.toLowerCase())) {
@@ -140,9 +144,25 @@ public class Terminal {
                         }
 
                         //检查执行结果。若执行出现参数问题，应当认为此次命令执行失败，清空上下文
-                        if (!result) {
+                        if (result.getExecuteState() == ExecuteState.FAIL) {
                             contextTimes = -1;
                             contextCommand = null;
+                        }
+
+                        //如果需要重新执行
+                        if (result.getExecuteState() == ExecuteState.NEED_REPEAT) {
+                            //把contextTime重新减回来
+                            contextTimes --;
+                        }
+
+                        if (result.getExecuteState() == ExecuteState.STAGE_JUMP_TO) {
+                            //把contextTime跳转到指定的stage中，并检查该stage大于0
+                            if (result.getJumToStage() > 0) {
+                                contextTimes = result.getJumToStage() -1; // -1是因为在下一次while循环的开始又会对这个contextTime++，故减去1
+                            } else {
+                                //非法的跳跃stage，抛出异常
+                                throw new IllegalJumpStageException("Illegal jump stage: " + result.getJumToStage());
+                            }
                         }
 
                         continue; //当前的上下文指令已经处理完，走下一次while循环，避免跳出if块后继续执行剩下代码导致同一个命令被处理两次
@@ -155,19 +175,17 @@ public class Terminal {
                 }
 
                 //当前不存在上下文，正常执行
-                //拿到顶部命令
+                //拿到顶部命令，如果有重复执行的指令则用重复执行的指令
                 String topCommand = inputs[0];
                 String[] args = Arrays.copyOfRange(inputs, 1, inputs.length);
                 //若命令含有上下文，则设置好。该操作必须在命令执行之前，因为我们要用这个contextTimes去匹配stage
-                if (strictMatchCommandsWithContext.contains(topCommand)) {
+                if (strictMatchCommandsWithContext.contains(topCommand)
+                    || easeMatchCommandsWithContext.contains(topCommand.toLowerCase())) {
                     contextCommand = topCommand;
                     contextTimes ++; //默认是-1，加1后为0，刚好匹配stage=0，代表初次指令输入
-                } else if (easeMatchCommandsWithContext.contains(topCommand.toLowerCase())) {
-                    contextCommand = topCommand;
-                    contextTimes ++;
                 }
 
-                boolean result;
+                ExecuteResult result;
 
                 //检查命令是否存在
                 if (strictMatchCommandHandlers.containsKey(topCommand)) {
@@ -177,13 +195,15 @@ public class Terminal {
                 } else {
                     //命令不存在
                     options.getCommandDoesntExistProcessor().accept(topCommand);
-                    result = false;
+                    result = new ExecuteResult(ExecuteState.FAIL, -2);
                 }
 
-                if (!result) {
+                if (result.getExecuteState() == ExecuteState.FAIL) {
                     contextTimes = -1;
                     contextCommand = null;
                 }
+
+                //普通命令或者上下文命令的stage0不做repeat处理和jumpTo处理
             }
         }
     }

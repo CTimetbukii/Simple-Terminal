@@ -1,5 +1,7 @@
 package io.github.ctimetbukii.simpleterminal.annotations;
 
+import io.github.ctimetbukii.simpleterminal.ArgsTypeTransformMethod;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -22,4 +24,9 @@ public @interface CommandExecutor {
      * 默认为不启用。
      */
     boolean paraJoin() default false;
+
+    /**
+     * 将用户输入转换为参数入参类型的方式
+     */
+    ArgsTypeTransformMethod paraTransformMethod() default ArgsTypeTransformMethod.COERCE_WITH_INTERPRET;
 }

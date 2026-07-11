@@ -1,16 +1,20 @@
 package io.github.ctimetbukii.simpleterminal.process;
 
+import io.github.ctimetbukii.elegantconvertchecker.ConvertChecker;
+import io.github.ctimetbukii.elegantconvertchecker.Converter;
 import io.github.ctimetbukii.simpleterminal.CommandSign;
 import io.github.ctimetbukii.simpleterminal.annotations.ArgsIllegalExecutor;
 import io.github.ctimetbukii.simpleterminal.annotations.CommandExecutor;
 import io.github.ctimetbukii.simpleterminal.annotations.ContextCommandExecutor;
 import io.github.ctimetbukii.simpleterminal.annotations.SubCommandExecutor;
+import io.github.ctimetbukii.simpleterminal.exceptions.NeedRepeatException;
 import io.github.ctimetbukii.simpleterminal.exceptions.RepeatCommandSignException;
 import io.github.ctimetbukii.simpleterminal.utils.CastUtil;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -102,7 +106,7 @@ public class CommandHandler implements ICommandProcessor {
      */
     @SneakyThrows
     @Override
-    public boolean accept(String[] args, int contextStage) {
+    public ExecuteResult accept(String[] args, int contextStage) {
         Set<CommandSign> signs;
         HashMap<CommandSign, Method> executorMap;
         boolean isSubCommandRegistered = false;
@@ -150,36 +154,58 @@ public class CommandHandler implements ICommandProcessor {
         if (signs.isEmpty()) {
             //为空说明没有符合条件的CommandExecutor，传入 参数错误 命令处理器
             if (argsIllegalExecutor != null) {
-                argsIllegalExecutor.invoke(invokeObj, (Object[]) args);
+                //检查参数错误命令处理器中有没有参数
+                if (argsIllegalExecutor.getParameterCount() == 0) {
+                    //没有参数，就正常执行，不传参了
+                    argsIllegalExecutor.invoke(invokeObj);
+                } else {
+                    //有参数。传入一整个数组参数。参数错误命令处理器要求如果有参数，则必须是一个数组
+                    argsIllegalExecutor.invoke(invokeObj, (Object[]) args);
+                }
             } else {
                 //参数错误命令处理器此时未定义，执行默认行为
                 outputStream.write("Command args are illegal!\n".getBytes());
             }
-            return false;
+            return new ExecuteResult(ExecuteState.FAIL, -2);
         } else {
             //不为空，说明匹配到了对应的CommandSign.
             //这里的值只可能是一个，因为我们早做了CommandSign去重
             CommandSign sign = signs.iterator().next();
-            //检查是否要求进行参数拼接
-            if (sign.isParaJoin()) {
-                //进行参数拼接后传入
-                String para;
-                //取出对应的Method，执行
-                if (isSubCommandRegistered) {
-                    para = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
+
+            try {
+                Object returned = null;
+                //检查是否要求进行参数拼接
+                if (sign.isParaJoin()) {
+                    //进行参数拼接后传入
+                    String para;
+                    //取出对应的Method，执行
+                    if (isSubCommandRegistered) {
+                        para = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
+                    } else {
+                        para = String.join(" ", args);
+                    }
+                    executorMap.get(sign).invoke(invokeObj, para);
                 } else {
-                    para = String.join(" ", args);
+                    //不要求参数拼接
+                    if (isSubCommandRegistered) {
+                        returned = executorMap.get(sign).invoke(invokeObj, CastUtil.castArgs(Arrays.copyOfRange(args, 1, args.length), sign.getParaTypes(), sign.getTransformExecutor()));
+                    } else {
+                        returned = executorMap.get(sign).invoke(invokeObj, CastUtil.castArgs(args, sign.getParaTypes(), sign.getTransformExecutor()));
+                    }
                 }
-                executorMap.get(sign).invoke(invokeObj, para);
-            } else {
-                //不要求参数拼接
-                if (isSubCommandRegistered) {
-                    executorMap.get(sign).invoke(invokeObj, CastUtil.castArgs(Arrays.copyOfRange(args, 1, args.length), sign.getParaTypes()));
-                } else {
-                    executorMap.get(sign).invoke(invokeObj, CastUtil.castArgs(args, sign.getParaTypes()));
+
+                if (returned != null && ConvertChecker.isCoercibleToInt(returned.toString())) {
+                    return new ExecuteResult(ExecuteState.STAGE_JUMP_TO, Converter.convertToInt(returned.toString()));
                 }
+            } catch (InvocationTargetException e) {
+                if (e.getCause() != null && e.getCause() instanceof NeedRepeatException){
+                    return new ExecuteResult(ExecuteState.NEED_REPEAT, -2);
+                }
+                //noinspection CallToPrintStackTrace
+                e.printStackTrace();
+                return new ExecuteResult(ExecuteState.FAIL, -2);
             }
         }
-        return true;
+        return new ExecuteResult(ExecuteState.SUCCEED, -2);
     }
 }

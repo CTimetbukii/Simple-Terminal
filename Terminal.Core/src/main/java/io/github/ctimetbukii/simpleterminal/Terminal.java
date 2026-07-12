@@ -92,16 +92,6 @@ public class Terminal {
             registerCommandHandler(DefaultStopCommandProcessor.class);
         }
 
-        if (options.isRunAsync()) {
-            if (options.getRunExecutor() == null) {
-                asyncThread = new Thread(this::monitorInput);
-                asyncThread.start();
-            } else {
-                monitorInputFuture = options.getRunExecutor().submit(this::monitorInput);
-            }
-        } else {
-            monitorInput();
-        }
 
         Set<String> allCommands = new HashSet<>();
         allCommands.addAll(strictMatchCommandHandlers.keySet());
@@ -112,7 +102,7 @@ public class Terminal {
         //检查alias与已经注册的正式命令有无冲突的
         for (String alias : aliasToEaseRawCommand.keySet()) {
             if (easeMatchCommandHandlers.containsKey(alias.toLowerCase())
-                || strictMatchCommandHandlers.containsKey(alias)) {
+                    || strictMatchCommandHandlers.containsKey(alias)) {
                 throw new AliasConflictWithCommandException(alias);
             }
         }
@@ -122,6 +112,20 @@ public class Terminal {
                     || strictMatchCommandHandlers.containsKey(alias)) {
                 throw new AliasConflictWithCommandException(alias);
             }
+        }
+
+        ///////////////////////////////
+        //这段代码必须放在最后执行！
+        ///////////////////////////////
+        if (options.isRunAsync()) {
+            if (options.getRunExecutor() == null) {
+                asyncThread = new Thread(this::monitorInput);
+                asyncThread.start();
+            } else {
+                monitorInputFuture = options.getRunExecutor().submit(this::monitorInput);
+            }
+        } else {
+            monitorInput();
         }
     }
 

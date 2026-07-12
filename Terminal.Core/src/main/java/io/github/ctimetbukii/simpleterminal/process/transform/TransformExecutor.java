@@ -1,4 +1,4 @@
-package io.github.ctimetbukii.simpleterminal.utils.transform;
+package io.github.ctimetbukii.simpleterminal.process.transform;
 
 public interface TransformExecutor {
     boolean checkTransformable(String source, Class<?> targetType);

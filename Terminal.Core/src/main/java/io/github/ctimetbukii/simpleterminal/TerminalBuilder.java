@@ -5,7 +5,8 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.PrintStream;
+import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 
@@ -64,7 +65,7 @@ public class TerminalBuilder {
      * @param output 终端输出流
      * @return TerminalBuilder 实例
      */
-    public TerminalBuilder setTerminalOutputStream(OutputStream output) {
+    public TerminalBuilder setTerminalOutputStream(PrintStream output) {
         options.setOutputStream(output);
         return this;
     }
@@ -110,6 +111,23 @@ public class TerminalBuilder {
      */
     public TerminalBuilder setCommandDoesntExistProcessor(Consumer<String> processor) {
         options.setCommandDoesntExistProcessor(processor);
+        return this;
+    }
+
+    /**
+     * 设置命令的解释映射。设置了descriptionKey时，help指令从这里获取命令解释。可以传入不同的properties以实现i18n
+     */
+    public TerminalBuilder setCommandDescriptions(Properties descriptions) {
+        options.setCommandDescriptions(descriptions);
+        return this;
+    }
+
+    /**
+     * 设置stopRunnable。stopRunnable即stop指令执行时需要处理的内容。当stop指令执行时，会首先调用各个ClosableFlag的closeResource，
+     * 然后调用此stopRunnable，用户可以在这里加入其自身的一些关闭内容。随后，stop指令将调用System.exit使进程退出
+     */
+    public TerminalBuilder setStopRunnable(Runnable stopRunnable) {
+        options.setStopRunnable(stopRunnable);
         return this;
     }
 

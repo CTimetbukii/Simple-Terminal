@@ -1,4 +1,4 @@
-package io.github.ctimetbukii.simpleterminal;
+package io.github.ctimetbukii.simpleterminal.process.transform;
 
 import io.github.ctimetbukii.elegantconvertchecker.Converter;
 import io.github.ctimetbukii.elegantconvertchecker.ConvertChecker;

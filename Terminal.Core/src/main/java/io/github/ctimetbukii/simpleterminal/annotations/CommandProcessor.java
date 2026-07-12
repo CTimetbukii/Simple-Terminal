@@ -17,6 +17,11 @@ public @interface CommandProcessor {
     String value();
 
     /**
+     * 该命令的别称
+     */
+    String[] alias() default {};
+
+    /**
      * 同时匹配大写指令，小写指令以及大小写混用指令。默认为true。 <br/>
      * 例如，该值为true时，mycommand，MYCOMMAND，MyCommand，mYCOMMand等都会被@CommandProcessor("mycommand")匹配。
      * 为false时则只有mycommand能被匹配
@@ -39,4 +44,9 @@ public @interface CommandProcessor {
      * 方法，仍然视其为没有上下文。
      */
     boolean hasContext() default false;
+
+    /**
+     * 用于查询该命令描述的Properties Key。
+     */
+    String descriptionKey() default "";
 }

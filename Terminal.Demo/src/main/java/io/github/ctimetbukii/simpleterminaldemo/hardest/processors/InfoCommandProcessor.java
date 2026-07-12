@@ -2,13 +2,19 @@ package io.github.ctimetbukii.simpleterminaldemo.hardest.processors;
 
 import io.github.ctimetbukii.simpleterminal.annotations.CommandExecutor;
 import io.github.ctimetbukii.simpleterminal.annotations.CommandProcessor;
+import io.github.ctimetbukii.simpleterminal.annotations.InjectOutPrintStream;
 import io.github.ctimetbukii.simpleterminal.annotations.SubCommandExecutor;
+
+import java.io.PrintStream;
 
 @CommandProcessor("info")
 public class InfoCommandProcessor {
+    @InjectOutPrintStream
+    private PrintStream out;
+
     @CommandExecutor
     public void info() {
-        System.out.println("'info command' called. method#info called.");
+        out.println("'info command' called. method#info called.");
     }
 
     /**
@@ -16,7 +22,7 @@ public class InfoCommandProcessor {
      */
     @SubCommandExecutor("cpu")
     public void infoCpu() {
-        System.out.println("'info cpu' command called. method#infoCpu called.");
+        out.println("'info cpu' command called. method#infoCpu called.");
     }
 
     /**
@@ -25,6 +31,6 @@ public class InfoCommandProcessor {
      */
     @SubCommandExecutor(value = "mem", matchUpperAndLowerCase = false)
     public void infoMem() {
-        System.out.println("'info mem' command called. method#infoMem called.");
+        out.println("'info mem' command called. method#infoMem called.");
     }
 }

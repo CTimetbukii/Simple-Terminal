@@ -1,6 +1,8 @@
 package io.github.ctimetbukii.simpleterminal;
 
 import io.github.ctimetbukii.simpleterminal.annotations.ContextCommandExecutor;
+import io.github.ctimetbukii.simpleterminal.defaults.DefaultHelpCommandProcessor;
+import io.github.ctimetbukii.simpleterminal.defaults.DefaultStopCommandProcessor;
 import io.github.ctimetbukii.simpleterminal.exceptions.IllegalJumpStageException;
 import io.github.ctimetbukii.simpleterminal.exceptions.IllogicalPanicException;
 import io.github.ctimetbukii.simpleterminal.process.CommandHandler;
@@ -71,39 +73,20 @@ public class Terminal {
         Set<Class<?>> commandProcessors = reflections.getTypesAnnotatedWith(CommandProcessor.class);
 
         //注册命令处理器
-        commandProcessors.forEach(cls -> {
-            CommandProcessor processorAnn = cls.getAnnotation(CommandProcessor.class);
-            Method[] methods = cls.getMethods();
-            int contextLength;
+        commandProcessors.forEach(this::registerCommandHandler);
 
-            if (processorAnn.hasContext()) {
-                Optional<Method> maxContextExecutor =  Arrays.stream(methods).filter(method -> method.isAnnotationPresent(ContextCommandExecutor.class))
-                        .max(Comparator.comparingInt(m -> m.getAnnotation(ContextCommandExecutor.class).stage()));
-                if (maxContextExecutor.isPresent()) {
-                    contextLength = maxContextExecutor.get().getAnnotation(ContextCommandExecutor.class).stage();
-                } else {
-                    throw new IllogicalPanicException("A CommandProcessor with context has not ContextCommandExecutor.");
-                }
-            } else {
-                contextLength = 0;
-            }
+        //检查用户是否已经注册了help方法，否则我们注册默认的
+        if (easeMatchCommandHandlers.keySet().stream().noneMatch(key -> key.equalsIgnoreCase("help"))
+            && strictMatchCommandHandlers.keySet().stream().noneMatch(key -> key.equals("help"))) {
+            //注册默认帮助
+            registerCommandHandler(DefaultHelpCommandProcessor.class);
+        }
 
-            contextLengthMap.put(processorAnn.value().toLowerCase(), contextLength);
-
-            if (processorAnn.matchUpperAndLowerCase()) {
-                easeMatchCommandHandlers.put(processorAnn.value().toLowerCase(), new CommandHandler(cls, contextLength, options.getOutputStream()));
-            } else {
-                strictMatchCommandHandlers.put(processorAnn.value(), new CommandHandler(cls, contextLength, options.getOutputStream()));
-            }
-            //处理含有上下文的指令
-            if (processorAnn.hasContext()) {
-                if (processorAnn.matchUpperAndLowerCase()) {
-                    easeMatchCommandsWithContext.add(processorAnn.value());
-                } else {
-                    strictMatchCommandsWithContext.add(processorAnn.value());
-                }
-            }
-        });
+        //检查并注册stop命令
+        if (easeMatchCommandHandlers.keySet().stream().noneMatch(key -> key.equalsIgnoreCase("stop"))
+            && strictMatchCommandHandlers.keySet().stream().noneMatch(key -> key.equals("stop"))) {
+            registerCommandHandler(DefaultStopCommandProcessor.class);
+        }
 
         if (options.isRunAsync()) {
             if (options.getRunExecutor() == null) {
@@ -114,6 +97,40 @@ public class Terminal {
             }
         } else {
             monitorInput();
+        }
+    }
+
+    private void registerCommandHandler(Class<?> cls) {
+        CommandProcessor processorAnn = cls.getAnnotation(CommandProcessor.class);
+        Method[] methods = cls.getMethods();
+        int contextLength;
+
+        if (processorAnn.hasContext()) {
+            Optional<Method> maxContextExecutor =  Arrays.stream(methods).filter(method -> method.isAnnotationPresent(ContextCommandExecutor.class))
+                    .max(Comparator.comparingInt(m -> m.getAnnotation(ContextCommandExecutor.class).stage()));
+            if (maxContextExecutor.isPresent()) {
+                contextLength = maxContextExecutor.get().getAnnotation(ContextCommandExecutor.class).stage();
+            } else {
+                throw new IllogicalPanicException("A CommandProcessor with context has not ContextCommandExecutor.");
+            }
+        } else {
+            contextLength = 0;
+        }
+
+        contextLengthMap.put(processorAnn.value().toLowerCase(), contextLength);
+
+        if (processorAnn.matchUpperAndLowerCase()) {
+            easeMatchCommandHandlers.put(processorAnn.value().toLowerCase(), new CommandHandler(cls, contextLength, options));
+        } else {
+            strictMatchCommandHandlers.put(processorAnn.value(), new CommandHandler(cls, contextLength, options));
+        }
+        //处理含有上下文的指令
+        if (processorAnn.hasContext()) {
+            if (processorAnn.matchUpperAndLowerCase()) {
+                easeMatchCommandsWithContext.add(processorAnn.value());
+            } else {
+                strictMatchCommandsWithContext.add(processorAnn.value());
+            }
         }
     }
 
@@ -206,6 +223,28 @@ public class Terminal {
                 //普通命令或者上下文命令的stage0不做repeat处理和jumpTo处理
             }
         }
+    }
+
+    public Set<String> getAllCommands() {
+        Set<String> commands = new HashSet<>(easeMatchCommandHandlers.keySet());
+        commands.addAll(strictMatchCommandHandlers.keySet());
+        return commands;
+    }
+
+    public Set<String> getEaseMatchCommands() {
+        return easeMatchCommandHandlers.keySet();
+    }
+
+    public Set<String> getEaseMatchCommandsCopy() {
+        return new HashSet<>(getEaseMatchCommands());
+    }
+
+    public Set<String> getStrictMatchCommands() {
+        return strictMatchCommandHandlers.keySet();
+    }
+
+    public Set<String> getStrictMatchCommandsCopy() {
+        return new HashSet<>(getStrictMatchCommands());
     }
 
     public void stop() {

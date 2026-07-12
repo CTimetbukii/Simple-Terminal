@@ -1,6 +1,6 @@
 package io.github.ctimetbukii.simpleterminal.annotations;
 
-import io.github.ctimetbukii.simpleterminal.ArgsTypeTransformMethod;
+import io.github.ctimetbukii.simpleterminal.process.transform.ArgsTypeTransformMethod;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

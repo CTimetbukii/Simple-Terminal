@@ -1,6 +1,6 @@
 package io.github.ctimetbukii.simpleterminal;
 
-import io.github.ctimetbukii.simpleterminal.utils.transform.*;
+import io.github.ctimetbukii.simpleterminal.process.transform.*;
 import lombok.Getter;
 
 import java.util.Arrays;

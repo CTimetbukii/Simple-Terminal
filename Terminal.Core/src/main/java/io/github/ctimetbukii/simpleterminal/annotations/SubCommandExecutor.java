@@ -1,6 +1,6 @@
 package io.github.ctimetbukii.simpleterminal.annotations;
 
-import io.github.ctimetbukii.simpleterminal.ArgsTypeTransformMethod;
+import io.github.ctimetbukii.simpleterminal.process.transform.ArgsTypeTransformMethod;
 
 import java.lang.annotation.*;
 
@@ -8,12 +8,17 @@ import java.lang.annotation.*;
  * 标记具体执行子命令的方法，用法与CommandExecutor类似。
  */
 @Target(ElementType.METHOD)
-@Retention(RetentionPolicy.RUNTIME)
+@Retention(RetentionPolicy.RUNTIME) //TODO 支持Repeatable或者引入一种新的可以同时处理 -m -c -h 这种子命令重复的方式
 public @interface SubCommandExecutor {
     /**
      * 子命令
      */
     String value();
+
+    /**
+     * 该命令的别称
+     */
+    String[] alias() default {};
 
     /**
      * 同时匹配大写指令和小写指令。默认为true。 <br/>
@@ -39,4 +44,9 @@ public @interface SubCommandExecutor {
      * 将用户输入转换为参数入参类型的方式
      */
     ArgsTypeTransformMethod paraTransformMethod() default ArgsTypeTransformMethod.COERCE_WITH_INTERPRET;
+
+    /**
+     * 用于查询该命令描述的Properties Key。
+     */
+    String descriptionKey() default "";
 }

@@ -1,6 +1,6 @@
 package io.github.ctimetbukii.simpleterminal.utils;
 
-import io.github.ctimetbukii.simpleterminal.utils.transform.TransformExecutor;
+import io.github.ctimetbukii.simpleterminal.process.transform.TransformExecutor;
 
 public class CastUtil {
     public static Object[] castArgs(String[] args, Class<?>[] types, TransformExecutor transformExecutor) {

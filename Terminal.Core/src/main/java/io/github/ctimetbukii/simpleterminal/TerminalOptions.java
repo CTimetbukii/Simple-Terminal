@@ -4,9 +4,9 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.PrintStream;
+import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 
@@ -52,14 +52,14 @@ public class TerminalOptions {
      */
     @Getter
     @Setter
-    private OutputStream outputStream = System.out;
+    private PrintStream outputStream = System.out;
 
     /**
      * 终端错误输出流
      */
     @Getter
     @Setter
-    private OutputStream errOutputStream = System.err;
+    private PrintStream errOutputStream = System.err;
 
     /**
      * 用于锚定命令处理器的包路径。例如，若将带有CommandExecutorMethod的方法的类放在com.example下，则该值应当为com.example。
@@ -75,12 +75,21 @@ public class TerminalOptions {
      */
     @Getter
     @Setter
-    private Consumer<String> commandDoesntExistProcessor = cmd -> {
-        byte[] warningBytes = ("Command '" + cmd + "' doesn't exists.\n").getBytes();
-        try {
-            getErrOutputStream().write(warningBytes);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    };
+    private Consumer<String> commandDoesntExistProcessor = cmd ->
+            getErrOutputStream().println("Command '" + cmd + "' doesn't exists.");
+
+    /**
+     * 各个命令的解释映射。设置了descriptionKey时，help指令从这里获取命令解释
+     */
+    @Getter
+    @Setter
+    private Properties commandDescriptions;
+
+    /**
+     * stop指令执行时需要处理的内容。当stop指令执行时，会首先调用各个ClosableFlag的closeResource，
+     * 然后调用此stopRunnable，用户可以在这里加入其自身的一些关闭内容。随后，stop指令将调用System.exit使进程退出
+     */
+    @Getter
+    @Setter
+    private Runnable stopRunnable;
 }

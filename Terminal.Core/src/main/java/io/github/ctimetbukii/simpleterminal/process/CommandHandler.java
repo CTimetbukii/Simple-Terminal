@@ -7,6 +7,7 @@ import io.github.ctimetbukii.simpleterminal.TerminalOptions;
 import io.github.ctimetbukii.simpleterminal.annotations.*;
 import io.github.ctimetbukii.simpleterminal.exceptions.IllegalInjectObjectException;
 import io.github.ctimetbukii.simpleterminal.exceptions.NeedRepeatException;
+import io.github.ctimetbukii.simpleterminal.exceptions.NoAccessibleNecessaryExecutor;
 import io.github.ctimetbukii.simpleterminal.exceptions.RepeatCommandSignException;
 import io.github.ctimetbukii.simpleterminal.flags.ClosableFlag;
 import io.github.ctimetbukii.simpleterminal.utils.CastUtil;
@@ -71,6 +72,7 @@ public class CommandHandler {
         }
 
         CommandSign sign;
+        int accessibleNeccesseryExecutor = 0;
         for (Method method : methods) {
             method.setAccessible(true); //跳过安全检查，访问private的同时，使invoke速度加快
 
@@ -82,6 +84,7 @@ public class CommandHandler {
                 }
                 //sign唯一，存入map
                 commandExecutors.put(sign, method);
+                accessibleNeccesseryExecutor ++;
                 continue;
             }
 
@@ -91,6 +94,7 @@ public class CommandHandler {
                     throw new RepeatCommandSignException(cls);
                 }
                 subCommandExecutors.put(sign, method);
+                accessibleNeccesseryExecutor ++;
                 continue;
             }
 
@@ -106,6 +110,10 @@ public class CommandHandler {
             if (method.isAnnotationPresent(ArgsIllegalExecutor.class)) {
                 argsIllegalExecutor = method;
             }
+        }
+
+        if (accessibleNeccesseryExecutor == 0) {
+            throw new NoAccessibleNecessaryExecutor("No accessible necessary executor in " + cls.getName());
         }
 
         //检查是否标记了ClosableFlag

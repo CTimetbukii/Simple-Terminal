@@ -3,11 +3,12 @@ package io.github.ctimetbukii.simpleterminal;
 import io.github.ctimetbukii.simpleterminal.annotations.ContextCommandExecutor;
 import io.github.ctimetbukii.simpleterminal.defaults.DefaultHelpCommandProcessor;
 import io.github.ctimetbukii.simpleterminal.defaults.DefaultStopCommandProcessor;
-import io.github.ctimetbukii.simpleterminal.exceptions.IllegalJumpStageException;
-import io.github.ctimetbukii.simpleterminal.exceptions.IllogicalPanicException;
+import io.github.ctimetbukii.simpleterminal.exceptions.*;
 import io.github.ctimetbukii.simpleterminal.process.CommandHandler;
 import io.github.ctimetbukii.simpleterminal.process.ExecuteResult;
 import io.github.ctimetbukii.simpleterminal.process.ExecuteState;
+import io.github.ctimetbukii.simpleterminal.utils.GlobalTransmitter;
+import io.github.ctimetbukii.simpleterminal.utils.TransmitterKey;
 import lombok.Getter;
 import io.github.ctimetbukii.simpleterminal.annotations.CommandProcessor;
 import org.reflections.Reflections;
@@ -52,6 +53,9 @@ public class Terminal {
     private final HashSet<String> easeMatchCommandsWithContext = new HashSet<>(); //这两个HashSet不能合并，否则匹配时可能导致由于要求严格匹配的指令被输入了含错误大小写的指令而错误地启用了上下文
     //上下文长度记录
     private final HashMap<String, Integer> contextLengthMap = new HashMap<>();
+    //别名到正经名的映射
+    private final HashMap<String, String> aliasToEaseRawCommand = new HashMap<>();
+    private final HashMap<String, String> aliasToStrictRawCommand = new HashMap<>();
 
     public Terminal() {
         this(new TerminalOptions());
@@ -98,6 +102,27 @@ public class Terminal {
         } else {
             monitorInput();
         }
+
+        Set<String> allCommands = new HashSet<>();
+        allCommands.addAll(strictMatchCommandHandlers.keySet());
+        allCommands.addAll(easeMatchCommandHandlers.keySet());
+
+        GlobalTransmitter.getTransmitter().put(TransmitterKey.ALL_COMMANDS, allCommands);
+
+        //检查alias与已经注册的正式命令有无冲突的
+        for (String alias : aliasToEaseRawCommand.keySet()) {
+            if (easeMatchCommandHandlers.containsKey(alias.toLowerCase())
+                || strictMatchCommandHandlers.containsKey(alias)) {
+                throw new AliasConflictWithCommandException(alias);
+            }
+        }
+
+        for (String alias : aliasToStrictRawCommand.keySet()) {
+            if (easeMatchCommandHandlers.containsKey(alias.toLowerCase())
+                    || strictMatchCommandHandlers.containsKey(alias)) {
+                throw new AliasConflictWithCommandException(alias);
+            }
+        }
     }
 
     private void registerCommandHandler(Class<?> cls) {
@@ -121,8 +146,22 @@ public class Terminal {
 
         if (processorAnn.matchUpperAndLowerCase()) {
             easeMatchCommandHandlers.put(processorAnn.value().toLowerCase(), new CommandHandler(cls, contextLength, options));
+
+            for (String alias : processorAnn.alias()) {
+                if (aliasToEaseRawCommand.containsKey(alias)) {
+                    throw new RepeatAliasException(alias);
+                }
+                aliasToEaseRawCommand.put(alias, processorAnn.value().toLowerCase());
+            }
         } else {
             strictMatchCommandHandlers.put(processorAnn.value(), new CommandHandler(cls, contextLength, options));
+
+            for (String alias : processorAnn.alias()) {
+                if (aliasToStrictRawCommand.containsKey(alias)) {
+                    throw new RepeatAliasException(alias);
+                }
+                aliasToStrictRawCommand.put(alias, processorAnn.value());
+            }
         }
         //处理含有上下文的指令
         if (processorAnn.hasContext()) {
@@ -194,6 +233,15 @@ public class Terminal {
                 //当前不存在上下文，正常执行
                 //拿到顶部命令，如果有重复执行的指令则用重复执行的指令
                 String topCommand = inputs[0];
+
+                //检查命令是否存在，首先检查是不是别名
+                if (aliasToEaseRawCommand.containsKey(topCommand)) {
+                    //转译topCommand
+                    topCommand = aliasToEaseRawCommand.get(topCommand);
+                } else if (aliasToStrictRawCommand.containsKey(topCommand)) {
+                    topCommand = aliasToStrictRawCommand.get(topCommand);
+                }
+
                 String[] args = Arrays.copyOfRange(inputs, 1, inputs.length);
                 //若命令含有上下文，则设置好。该操作必须在命令执行之前，因为我们要用这个contextTimes去匹配stage
                 if (strictMatchCommandsWithContext.contains(topCommand)
@@ -204,7 +252,6 @@ public class Terminal {
 
                 ExecuteResult result;
 
-                //检查命令是否存在
                 if (strictMatchCommandHandlers.containsKey(topCommand)) {
                     result = strictMatchCommandHandlers.get(topCommand).accept(args, contextTimes);
                 } else if (easeMatchCommandHandlers.containsKey(topCommand.toLowerCase())) {

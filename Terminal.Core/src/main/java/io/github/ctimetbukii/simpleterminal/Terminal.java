@@ -7,16 +7,17 @@ import io.github.ctimetbukii.simpleterminal.exceptions.*;
 import io.github.ctimetbukii.simpleterminal.process.CommandHandler;
 import io.github.ctimetbukii.simpleterminal.process.ExecuteResult;
 import io.github.ctimetbukii.simpleterminal.process.ExecuteState;
-import io.github.ctimetbukii.simpleterminal.utils.GlobalTransmitter;
-import io.github.ctimetbukii.simpleterminal.utils.TransmitterKey;
+import io.github.ctimetbukii.simpleterminal.utils.records.TransmitterKey;
 import lombok.Getter;
 import io.github.ctimetbukii.simpleterminal.annotations.CommandProcessor;
+import lombok.SneakyThrows;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ConfigurationBuilder;
 
+import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.Future;
@@ -114,6 +115,9 @@ public class Terminal {
             }
         }
 
+        //挂载descriptions
+        loadDefaultDescriptionsProperties();
+
         ///////////////////////////////
         //这段代码必须放在最后执行！
         ///////////////////////////////
@@ -126,6 +130,20 @@ public class Terminal {
             }
         } else {
             monitorInput();
+        }
+    }
+
+    @SneakyThrows
+    private void loadDefaultDescriptionsProperties() {
+        //挂载默认命令的descriptions
+        //做i18n
+        String targetFile = "/io/github/ctimetbukii/simpleterminal/config/DefaultDescriptions.properties";
+        if (Locale.getDefault().getLanguage().equals("zh")) {
+            targetFile = "/io/github/ctimetbukii/simpleterminal/config/DefaultDescriptions_zh.properties";
+        }
+        //挂载
+        try (InputStream in = Terminal.class.getResourceAsStream(targetFile)) {
+            options.getDefaultDescriptions().load(in);
         }
     }
 

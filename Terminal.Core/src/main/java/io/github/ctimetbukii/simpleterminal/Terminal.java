@@ -7,6 +7,7 @@ import io.github.ctimetbukii.simpleterminal.exceptions.*;
 import io.github.ctimetbukii.simpleterminal.process.CommandHandler;
 import io.github.ctimetbukii.simpleterminal.process.ExecuteResult;
 import io.github.ctimetbukii.simpleterminal.process.ExecuteState;
+import io.github.ctimetbukii.simpleterminal.utils.records.CommandInformation;
 import io.github.ctimetbukii.simpleterminal.utils.records.TransmitterKey;
 import lombok.Getter;
 import io.github.ctimetbukii.simpleterminal.annotations.CommandProcessor;
@@ -18,6 +19,7 @@ import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ConfigurationBuilder;
 
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.Future;
@@ -143,7 +145,8 @@ public class Terminal {
         }
         //挂载
         try (InputStream in = Terminal.class.getResourceAsStream(targetFile)) {
-            options.getDefaultDescriptions().load(in);
+            assert in != null;
+            options.getDefaultDescriptions().load(new InputStreamReader(in, options.getPropertiesLoadCharset()));
         }
     }
 
@@ -193,6 +196,8 @@ public class Terminal {
                 strictMatchCommandsWithContext.add(processorAnn.value());
             }
         }
+
+        GlobalTransmitter.getCommandInformationMap().put(processorAnn.value(), new CommandInformation(cls));
     }
 
     private void monitorInput() {

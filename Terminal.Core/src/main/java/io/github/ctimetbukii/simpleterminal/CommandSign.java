@@ -18,7 +18,7 @@ public class CommandSign {
     @Getter
     private Class<?>[] paraTypes;
     @Getter
-    private int stage = 0;
+    private int stage;
     @Getter
     private boolean paraJoin;
     @Getter

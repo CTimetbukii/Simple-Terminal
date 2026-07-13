@@ -6,6 +6,8 @@ import lombok.Setter;
 
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
@@ -109,6 +111,13 @@ public class TerminalOptions {
     @Getter
     @Setter
     private String descriptionsFilePrefix;
+
+    /**
+     * 国际化Properties资源文件读取时所用的编码格式。默认为UTF-8
+     */
+    @Getter
+    @Setter
+    private Charset propertiesLoadCharset = StandardCharsets.UTF_8;
 
     /**
      * stop指令执行时需要处理的内容。当stop指令执行时，会首先调用各个ClosableFlag的closeResource，

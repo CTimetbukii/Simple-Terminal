@@ -15,7 +15,7 @@ import java.util.HashSet;
 import java.util.Timer;
 import java.util.TimerTask;
 
-@CommandProcessor("stop")
+@CommandProcessor(value = "stop", descriptionKey = "simpleterminal.defaults.stop")
 public class DefaultStopCommandProcessor {
     @InjectErrPrintStream
     private PrintStream err;
@@ -29,7 +29,7 @@ public class DefaultStopCommandProcessor {
     /**
      * 立即关闭terminal
      */
-    @CommandExecutor
+    @CommandExecutor(descriptionKey = "simpleterminal.defaults.stop.normal")
     public void stop() {
         out.println("Bye ~ ");
 
@@ -67,7 +67,7 @@ public class DefaultStopCommandProcessor {
      * 即为在200毫秒后关闭
      * @param millisDelay 延迟几毫秒
      */
-    @SubCommandExecutor("-ms")
+    @SubCommandExecutor(value = "-ms")
     public void stopAfterMillis(long millisDelay) {
         new Timer()
                 .schedule(new TimerTask() {

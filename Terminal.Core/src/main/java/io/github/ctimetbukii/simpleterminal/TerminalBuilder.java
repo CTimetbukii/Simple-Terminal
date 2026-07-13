@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.util.Properties;
+import java.nio.charset.Charset;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 
@@ -145,6 +145,14 @@ public class TerminalBuilder {
         resourceDir = resourceDir.replace('\\', '/').replaceAll("^/+|/+$", "");
         options.setDescriptionsResourceDir(resourceDir);
         options.setDescriptionsFilePrefix(filePrefix);
+        return this;
+    }
+
+    /**
+     * 设置国际化Properties资源文件读取时所用的编码格式。默认为UTF-8
+     */
+    public TerminalBuilder setPropertiesLoadCharset(Charset charset) {
+        options.setPropertiesLoadCharset(charset);
         return this;
     }
 

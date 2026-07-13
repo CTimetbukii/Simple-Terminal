@@ -17,6 +17,7 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -198,7 +199,7 @@ public class CommandHandler {
             try (InputStream is = ClassLoader.getSystemClassLoader().getResourceAsStream(path)) {
                 if (is != null) {
                     Properties props = new Properties();
-                    props.load(is);
+                    props.load(new InputStreamReader(is, options.getPropertiesLoadCharset()));
                     return props;
                 }
             }

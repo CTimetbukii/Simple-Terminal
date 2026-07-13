@@ -22,8 +22,7 @@ public class DefaultHelpCommandProcessor {
 
     @CommandExecutor
     public void help(String command) {
-//        out.println(command);
-        //TODO help
+
     }
 
     @CommandExecutor

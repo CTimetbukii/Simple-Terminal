@@ -67,7 +67,7 @@ public class DefaultStopCommandProcessor {
      * 即为在200毫秒后关闭
      * @param millisDelay 延迟几毫秒
      */
-    @SubCommandExecutor(value = "-ms")
+    @SubCommandExecutor(value = "-ms", descriptionKey = "simpleterminal.defaults.stop.millis")
     public void stopAfterMillis(long millisDelay) {
         new Timer()
                 .schedule(new TimerTask() {
@@ -85,7 +85,7 @@ public class DefaultStopCommandProcessor {
      * 即为在2秒后关闭
      * @param secsDelay 延迟几秒
      */
-    @SubCommandExecutor("-s")
+    @SubCommandExecutor(value = "-s", descriptionKey = "simpleterminal.defaults.stop.secs")
     public void stopAfterSecs(long secsDelay) {
         stopAfterMillis(secsDelay * 1000);
     }
@@ -96,7 +96,7 @@ public class DefaultStopCommandProcessor {
      * 即为在2分钟后关闭
      * @param minsDelay 延迟几分钟
      */
-    @SubCommandExecutor("-min")
+    @SubCommandExecutor(value = "-min", descriptionKey = "simpleterminal.defaults.stop.mins")
     public void stopAfterMins(long minsDelay) {
         stopAfterSecs(minsDelay * 60);
     }
@@ -107,7 +107,7 @@ public class DefaultStopCommandProcessor {
      * 即为在2小时后关闭
      * @param hoursDelay 延迟几小时
      */
-    @SubCommandExecutor("-h")
+    @SubCommandExecutor(value = "-h", descriptionKey = "simpleterminal.defaults.stop.hours")
     public void stopAfterHours(long hoursDelay) {
         stopAfterMins(hoursDelay * 60);
     }
@@ -118,7 +118,7 @@ public class DefaultStopCommandProcessor {
      * 即为在2天后关闭
      * @param daysDelay 延迟几天
      */
-    @SubCommandExecutor("-d")
+    @SubCommandExecutor(value = "-d", descriptionKey = "simpleterminal.defaults.stop.days")
     public void stopAfterDays(long daysDelay) {
         stopAfterHours(daysDelay * 24);
     }
@@ -130,7 +130,7 @@ public class DefaultStopCommandProcessor {
      * 如果想要指定在几个月后的同一天关闭，请使用 stop -r 指令
      * @param monthsDelay 延迟几个月
      */
-    @SubCommandExecutor("-mo")
+    @SubCommandExecutor(value = "-mo", descriptionKey = "simpleterminal.defaults.stop.months")
     public void stopAfterMonths(long monthsDelay) {
         stopAfterDays(monthsDelay * 30);
     }
@@ -141,7 +141,7 @@ public class DefaultStopCommandProcessor {
      * 即为在2年后关闭。注意，这里的延迟时间，是直接将年数乘以365算出延迟的天数，没有考虑现实中闰年时长为366天的问题。
      * 如果想要指定在几年后的同一天关闭，请使用stop -r 指令
      */
-    @SubCommandExecutor("-y")
+    @SubCommandExecutor(value = "-y", descriptionKey = "simpleterminal.defaults.stop.years")
     public void stopAfterYears(long yearsDelay) {
         stopAfterDays(yearsDelay * 365);
     }
@@ -161,7 +161,8 @@ public class DefaultStopCommandProcessor {
      */
     @SubCommandExecutor(value = "-r",
             paraTransformMethod = ArgsTypeTransformMethod.COERCE_WITH_INTERPRET,
-            patterns = {"-?\\d+", "^(0[1-9]|1[0-2])$", "^(0[1-9]|[12][0-9]|3[01])$"})
+            patterns = {"-?\\d+", "^(0[1-9]|1[0-2])$", "^(0[1-9]|[12][0-9]|3[01])$"},
+            descriptionKey = "simpleterminal.defaults.stop.at")
     public void stopAtRealTime(int targetYear,
                                int targetMon,
                                int targetDay) {
@@ -169,7 +170,8 @@ public class DefaultStopCommandProcessor {
     }
 
     @SubCommandExecutor(value = "-r", paraTransformMethod = ArgsTypeTransformMethod.COERCE_WITH_INTERPRET,
-            patterns = {"-?\\d+", "^(0[1-9]|1[0-2])$", "^(0[1-9]|[12][0-9]|3[01])$", "^([01][0-9]|2[0-3])$"})
+            patterns = {"-?\\d+", "^(0[1-9]|1[0-2])$", "^(0[1-9]|[12][0-9]|3[01])$", "^([01][0-9]|2[0-3])$"},
+            descriptionKey = "simpleterminal.defaults.stop.at")
     public void stopAtRealTime(int targetYear,
                                int targetMon,
                                int targetDay,
@@ -178,7 +180,8 @@ public class DefaultStopCommandProcessor {
     }
 
     @SubCommandExecutor(value = "-r", paraTransformMethod = ArgsTypeTransformMethod.COERCE_WITH_INTERPRET,
-            patterns = {"-?\\d+", "^(0[1-9]|1[0-2])$", "^(0[1-9]|[12][0-9]|3[01])$", "^([01][0-9]|2[0-3])$", "^([0-5][0-9])$"})
+            patterns = {"-?\\d+", "^(0[1-9]|1[0-2])$", "^(0[1-9]|[12][0-9]|3[01])$", "^([01][0-9]|2[0-3])$", "^([0-5][0-9])$"},
+            descriptionKey = "simpleterminal.defaults.stop.at")
     public void stopAtRealTime(int targetYear,
                                int targetMon,
                                int targetDay,
@@ -188,7 +191,8 @@ public class DefaultStopCommandProcessor {
     }
 
     @SubCommandExecutor(value = "-r", paraTransformMethod = ArgsTypeTransformMethod.COERCE_WITH_INTERPRET,
-            patterns = {"-?\\d+", "^(0[1-9]|1[0-2])$", "^(0[1-9]|[12][0-9]|3[01])$", "^([01][0-9]|2[0-3])$", "^([0-5][0-9])$", "^([0-5][0-9])$"})
+            patterns = {"-?\\d+", "^(0[1-9]|1[0-2])$", "^(0[1-9]|[12][0-9]|3[01])$", "^([01][0-9]|2[0-3])$", "^([0-5][0-9])$", "^([0-5][0-9])$"},
+            descriptionKey = "simpleterminal.defaults.stop.at")
     public void stopAtRealTime(int targetYear,
                                int targetMon,
                                int targetDay,
@@ -199,7 +203,8 @@ public class DefaultStopCommandProcessor {
     }
 
     @SubCommandExecutor(value = "-r", paraTransformMethod = ArgsTypeTransformMethod.COERCE_WITH_INTERPRET,
-                        patterns = {"-?\\d+", "^(0[1-9]|1[0-2])$", "^(0[1-9]|[12][0-9]|3[01])$", "^([01][0-9]|2[0-3])$", "^([0-5][0-9])$", "^([0-5][0-9])$", "^\\d{1,3}$"})
+                        patterns = {"-?\\d+", "^(0[1-9]|1[0-2])$", "^(0[1-9]|[12][0-9]|3[01])$", "^([01][0-9]|2[0-3])$", "^([0-5][0-9])$", "^([0-5][0-9])$", "^\\d{1,3}$"},
+            descriptionKey = "simpleterminal.defaults.stop.at")
     public void stopAtRealTime(int targetYear,
                                int targetMon,
                                int targetDay,

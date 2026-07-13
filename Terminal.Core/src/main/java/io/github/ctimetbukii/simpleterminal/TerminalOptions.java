@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
@@ -72,13 +73,16 @@ public class TerminalOptions {
     @NonNull
     private String anchorPackagePath;
 
+    //非常朴实无华的i18n
+    private final String commandDoesntExistMessage = Locale.getDefault().getLanguage().equals("zh") ? "命令 '%s' 不存在！" : "Command '%s' doesnt exist!";
+
     /**
      * 当命令不存在时处理不存在的命令。
      */
     @Getter
     @Setter
     private Consumer<String> commandDoesntExistProcessor = cmd ->
-            getErrOutputStream().println("Command '" + cmd + "' doesn't exists.");
+        getErrOutputStream().printf(commandDoesntExistMessage + "%n", cmd);
 
     /**
      * 内置默认指令的descriptions

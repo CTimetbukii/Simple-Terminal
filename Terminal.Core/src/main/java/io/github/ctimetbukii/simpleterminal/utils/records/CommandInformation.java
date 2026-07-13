@@ -15,13 +15,10 @@ public class CommandInformation {
     private CommandProcessor processorAnn;
 
     @Getter
-    private Set<ExecutorInformation> executorInformationSet = new HashSet<>();
+    private final Set<ExecutorInformation> executorInformationSet = new HashSet<>();
 
     @Getter
-    private Set<ContextExecutorInformation> contextExecutorInformationSet = new HashSet<>();
-
-    @Getter
-    private Set<SubExecutorInformation> subExecutorInformationSet = new HashSet<>();
+    private final Set<SubExecutorInformation> subExecutorInformationSet = new HashSet<>();
 
     public CommandInformation(Class<?> processorCls) {
         if (!processorCls.isAnnotationPresent(CommandProcessor.class)) {
@@ -33,8 +30,6 @@ public class CommandInformation {
         for (Method method : processorCls.getMethods()) {
             if (method.isAnnotationPresent(CommandExecutor.class)) {
                 executorInformationSet.add(new ExecutorInformation(method));
-            } else if (method.isAnnotationPresent(ContextCommandExecutor.class)) {
-                contextExecutorInformationSet.add(new ContextExecutorInformation(method));
             } else if (method.isAnnotationPresent(SubCommandExecutor.class)) {
                 subExecutorInformationSet.add(new SubExecutorInformation(method));
             }

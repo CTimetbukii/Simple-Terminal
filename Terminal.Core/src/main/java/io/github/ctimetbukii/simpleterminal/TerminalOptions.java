@@ -74,7 +74,8 @@ public class TerminalOptions {
     private String anchorPackagePath;
 
     //非常朴实无华的i18n
-    private final String commandDoesntExistMessage = Locale.getDefault().getLanguage().equals("zh") ? "命令 '%s' 不存在！" : "Command '%s' doesnt exist!";
+    @Getter
+    private final String defaultCmdDoesntExistMessage = Locale.getDefault().getLanguage().equals("zh") ? "命令 '%s' 不存在！" : "Command '%s' doesnt exist!";
 
     /**
      * 当命令不存在时处理不存在的命令。
@@ -82,13 +83,13 @@ public class TerminalOptions {
     @Getter
     @Setter
     private Consumer<String> commandDoesntExistProcessor = cmd ->
-        getErrOutputStream().printf(commandDoesntExistMessage + "%n", cmd);
+        getErrOutputStream().printf(defaultCmdDoesntExistMessage + "%n", cmd);
 
     /**
      * 内置默认指令的descriptions
      */
     @Getter
-    private Properties defaultDescriptions = new Properties();
+    private final Properties defaultDescriptions = new Properties();
 
     /**
      * 用户自定义命令的descriptions的properties文件的资源目录。

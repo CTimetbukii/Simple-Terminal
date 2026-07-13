@@ -1,5 +1,6 @@
-package io.github.ctimetbukii.simpleterminal.utils;
+package io.github.ctimetbukii.simpleterminal;
 
+import io.github.ctimetbukii.simpleterminal.utils.records.RunnableMethod;
 import lombok.Getter;
 
 import java.util.HashMap;

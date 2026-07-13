@@ -1,4 +1,4 @@
-package io.github.ctimetbukii.simpleterminal.utils;
+package io.github.ctimetbukii.simpleterminal.utils.records;
 
 import lombok.Getter;
 import lombok.SneakyThrows;

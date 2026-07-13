@@ -3,8 +3,8 @@ package io.github.ctimetbukii.simpleterminal.defaults;
 import io.github.ctimetbukii.simpleterminal.TerminalOptions;
 import io.github.ctimetbukii.simpleterminal.annotations.*;
 import io.github.ctimetbukii.simpleterminal.process.transform.ArgsTypeTransformMethod;
-import io.github.ctimetbukii.simpleterminal.utils.GlobalTransmitter;
-import io.github.ctimetbukii.simpleterminal.utils.RunnableMethod;
+import io.github.ctimetbukii.simpleterminal.GlobalTransmitter;
+import io.github.ctimetbukii.simpleterminal.utils.records.RunnableMethod;
 
 import java.io.PrintStream;
 import java.time.LocalDateTime;

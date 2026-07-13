@@ -79,11 +79,36 @@ public class TerminalOptions {
             getErrOutputStream().println("Command '" + cmd + "' doesn't exists.");
 
     /**
-     * 各个命令的解释映射。设置了descriptionKey时，help指令从这里获取命令解释
+     * 内置默认指令的descriptions
+     */
+    @Getter
+    private Properties defaultDescriptions = new Properties();
+
+    /**
+     * 用户自定义命令的descriptions的properties文件的资源目录。
+     * 不带前后斜杠
      */
     @Getter
     @Setter
-    private Properties commandDescriptions;
+    private String descriptionsResourceDir;
+
+    /**
+     * 用户自定义命令的descriptions的properties文件的文件前缀。Simple-Terminal会在
+     * descriptionsResourceDir下尝试查找带有此前缀的资源文件<br/>
+     * 除了文件前缀外，Simple-Terminal还会根据Language Code尝试查找
+     * 对应语言的文件。基本的格式与查找顺序是:<br/>
+     * <code>文件前缀_语言编码.properties</code><br/>
+     * <code>文件前缀.properties</code><br/>
+     * 例如，descriptionsFilePrefix为"descriptions"，语言编码为"zh"时，Simple-Terminal会依次尝试在
+     * 资源目录下查找下面的文件：<br/>
+     * <code>descriptions_zh.properties</code><br/>
+     * <code>descriptions.properties</code><br/>
+     * 语言编码由Locale.getDefault().getLanguage()返回，
+     * 以此实现国际化资源加载。用户不必再手动设置
+     */
+    @Getter
+    @Setter
+    private String descriptionsFilePrefix;
 
     /**
      * stop指令执行时需要处理的内容。当stop指令执行时，会首先调用各个ClosableFlag的closeResource，

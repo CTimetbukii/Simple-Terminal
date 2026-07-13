@@ -11,11 +11,12 @@ import io.github.ctimetbukii.simpleterminal.exceptions.NoAccessibleNecessaryExec
 import io.github.ctimetbukii.simpleterminal.exceptions.RepeatCommandSignException;
 import io.github.ctimetbukii.simpleterminal.flags.ClosableFlag;
 import io.github.ctimetbukii.simpleterminal.utils.CastUtil;
-import io.github.ctimetbukii.simpleterminal.utils.GlobalTransmitter;
-import io.github.ctimetbukii.simpleterminal.utils.RunnableMethod;
+import io.github.ctimetbukii.simpleterminal.GlobalTransmitter;
+import io.github.ctimetbukii.simpleterminal.utils.records.RunnableMethod;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -72,7 +73,7 @@ public class CommandHandler {
         }
 
         CommandSign sign;
-        int accessibleNeccesseryExecutor = 0;
+        int accessibleNecessaryExecutor = 0;
         for (Method method : methods) {
             method.setAccessible(true); //跳过安全检查，访问private的同时，使invoke速度加快
 
@@ -84,7 +85,7 @@ public class CommandHandler {
                 }
                 //sign唯一，存入map
                 commandExecutors.put(sign, method);
-                accessibleNeccesseryExecutor ++;
+                accessibleNecessaryExecutor++;
                 continue;
             }
 
@@ -94,7 +95,7 @@ public class CommandHandler {
                     throw new RepeatCommandSignException(cls);
                 }
                 subCommandExecutors.put(sign, method);
-                accessibleNeccesseryExecutor ++;
+                accessibleNecessaryExecutor++;
                 continue;
             }
 
@@ -112,7 +113,7 @@ public class CommandHandler {
             }
         }
 
-        if (accessibleNeccesseryExecutor == 0) {
+        if (accessibleNecessaryExecutor == 0) {
             throw new NoAccessibleNecessaryExecutor("No accessible necessary executor in " + cls.getName());
         }
 
@@ -157,6 +158,53 @@ public class CommandHandler {
                 throw new IllegalInjectObjectException("Field " + field.getName() + "from Class " + invokeObj.getClass().getName() + " cannot be annotated with InjectTerminalOption!");
             }
         }
+
+        if (field.isAnnotationPresent(InjectDefaultDescriptionProperties.class)) {
+            //挂载默认的Properties
+            if (Properties.class.isAssignableFrom(field.getType())) {
+                field.setAccessible(true);
+                field.set(invokeObj, this.options.getDefaultDescriptions());
+            } else {
+                throw new IllegalInjectObjectException("Field " + field.getName() + "from Class " + invokeObj.getClass().getName() + " cannot be annotated with InjectDefaultDescriptionProperties!");
+            }
+        }
+
+        if (field.isAnnotationPresent(InjectCommandDescriptionProperties.class)) {
+            if (Properties.class.isAssignableFrom(field.getType())) {
+                //挂载资源文件
+                Properties pps = loadI18nProperties(options.getDescriptionsResourceDir(), options.getDescriptionsFilePrefix());
+
+                //注入
+                field.setAccessible(true);
+                field.set(invokeObj, pps);
+            } else {
+                throw new IllegalInjectObjectException("Field " + field.getName() + "from Class " + invokeObj.getClass().getName() + " cannot be annotated with InjectCommandDescriptionProperties!");
+            }
+        }
+    }
+
+    @SneakyThrows
+    private Properties loadI18nProperties(String resourceDir, String prefix) {
+        if (resourceDir == null && prefix == null) {
+            return new Properties();
+        }
+
+        String[] candidates = {
+                resourceDir + "/" + prefix + "_" + Locale.getDefault().getLanguage() + ".properties",
+                resourceDir + "/" + prefix + ".properties"
+        };
+
+        for (String path : candidates) {
+            try (InputStream is = ClassLoader.getSystemClassLoader().getResourceAsStream(path)) {
+                if (is != null) {
+                    Properties props = new Properties();
+                    props.load(is);
+                    return props;
+                }
+            }
+        }
+
+        return new Properties();
     }
 
     /**

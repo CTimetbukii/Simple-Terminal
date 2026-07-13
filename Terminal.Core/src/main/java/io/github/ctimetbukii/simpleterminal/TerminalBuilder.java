@@ -115,19 +115,36 @@ public class TerminalBuilder {
     }
 
     /**
-     * 设置命令的解释映射。设置了descriptionKey时，help指令从这里获取命令解释。可以传入不同的properties以实现i18n
-     */
-    public TerminalBuilder setCommandDescriptions(Properties descriptions) {
-        options.setCommandDescriptions(descriptions);
-        return this;
-    }
-
-    /**
      * 设置stopRunnable。stopRunnable即stop指令执行时需要处理的内容。当stop指令执行时，会首先调用各个ClosableFlag的closeResource，
      * 然后调用此stopRunnable，用户可以在这里加入其自身的一些关闭内容。随后，stop指令将调用System.exit使进程退出
      */
     public TerminalBuilder setStopRunnable(Runnable stopRunnable) {
         options.setStopRunnable(stopRunnable);
+        return this;
+    }
+
+    /**
+     * 设置用户自定义命令的descriptions的properties文件的资源目录与文件前缀。Simple-Terminal会在
+     * resourceDir 下尝试查找带有此前缀的资源文件。资源目录不带前后斜杠。<br/>
+     * 除了文件前缀外，Simple-Terminal还会根据Language Code尝试查找
+     * 对应语言的文件。基本的格式与查找顺序是:<br/>
+     * <code>文件前缀_语言编码.properties</code><br/>
+     * <code>文件前缀.properties</code><br/>
+     * 例如，filePrefix 为"descriptions"，语言编码为"zh"时，Simple-Terminal会依次尝试在
+     * 资源目录下查找下面的文件：<br/>
+     * <code>descriptions_zh.properties</code><br/>
+     * <code>descriptions.properties</code><br/>
+     * 语言编码由Locale.getDefault().getLanguage()返回，
+     * 以此实现国际化资源加载。用户不必再手动设置
+     */
+    public TerminalBuilder setDescriptionsPath(String resourceDir, String filePrefix) {
+        if (resourceDir == null || filePrefix == null) {
+            throw new IllegalArgumentException("resourceDir & filePrefix cannot be null! use \"\" instead of null!");
+        }
+
+        resourceDir = resourceDir.replace('\\', '/').replaceAll("^/+|/+$", "");
+        options.setDescriptionsResourceDir(resourceDir);
+        options.setDescriptionsFilePrefix(filePrefix);
         return this;
     }
 

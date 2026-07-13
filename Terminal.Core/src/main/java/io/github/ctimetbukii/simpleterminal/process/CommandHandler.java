@@ -90,7 +90,7 @@ public class CommandHandler {
                 continue;
             }
 
-            if (method.isAnnotationPresent(SubCommandExecutor.class)) {
+            if (method.isAnnotationPresent(SubcommandExecutor.class)) {
                 sign = makeSubCommandExecutorCommandSign(method);
                 if (subCommandExecutors.containsKey(sign)) {
                     throw new RepeatCommandSignException(cls);
@@ -234,13 +234,19 @@ public class CommandHandler {
             //子命令
             String subCommand = args[0];
             //检查该子命令是否被注册
-            isSubCommandRegistered = subCommandExecutors.keySet().stream().anyMatch(cSign -> cSign.getCommandValue().equals(subCommand));
+            isSubCommandRegistered = subCommandExecutors.keySet().stream().anyMatch(cSign ->
+                    cSign.isMatchAllCasesForSubcommand()
+                            ? cSign.getCommandValue().equalsIgnoreCase(subCommand)
+                            : cSign.getCommandValue().equals(subCommand));
             if (isSubCommandRegistered) {
                 //已经被注册，走子命令通道
                 //截断args
                 String[] subArgs = Arrays.copyOfRange(args, 1, args.length);
                 signs = subCommandExecutors.keySet().stream()
-                        .filter(cSign -> cSign.getCommandValue().equals(subCommand))
+                        .filter(cSign ->
+                                cSign.isMatchAllCasesForSubcommand()
+                                        ? cSign.getCommandValue().equalsIgnoreCase(subCommand)
+                                        : cSign.getCommandValue().equals(subCommand))
                         .filter(cSign -> cSign.isMatchTypes(subArgs))
                         .filter(cSign -> cSign.isMatchPatterns(subArgs))
                         .collect(Collectors.toSet());

@@ -2,7 +2,7 @@ package io.github.ctimetbukii.simpleterminal.utils.records;
 
 import io.github.ctimetbukii.simpleterminal.annotations.CommandExecutor;
 import io.github.ctimetbukii.simpleterminal.annotations.CommandProcessor;
-import io.github.ctimetbukii.simpleterminal.annotations.SubCommandExecutor;
+import io.github.ctimetbukii.simpleterminal.annotations.SubcommandExecutor;
 import lombok.Getter;
 
 import java.lang.reflect.Method;
@@ -29,7 +29,7 @@ public class CommandInformation {
         for (Method method : processorCls.getMethods()) {
             if (method.isAnnotationPresent(CommandExecutor.class)) {
                 executorInformationSet.add(new ExecutorInformation(method));
-            } else if (method.isAnnotationPresent(SubCommandExecutor.class)) {
+            } else if (method.isAnnotationPresent(SubcommandExecutor.class)) {
                 subExecutorInformationSet.add(new SubExecutorInformation(method));
             }
         }

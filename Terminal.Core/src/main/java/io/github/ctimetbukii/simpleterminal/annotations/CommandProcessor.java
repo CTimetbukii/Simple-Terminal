@@ -26,7 +26,7 @@ public @interface CommandProcessor {
      * 例如，该值为true时，mycommand，MYCOMMAND，MyCommand，mYCOMMand等都会被@CommandProcessor("mycommand")匹配。
      * 为false时则只有mycommand能被匹配
      */
-    boolean matchUpperAndLowerCase() default true;
+    boolean matchAllCases() default true;
 
     /**
      * 当前命令是否含有上下文。默认为false即无上下文。<br/><br/>

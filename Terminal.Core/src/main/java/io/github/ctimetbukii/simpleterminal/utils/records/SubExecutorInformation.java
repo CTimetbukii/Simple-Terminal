@@ -1,6 +1,6 @@
 package io.github.ctimetbukii.simpleterminal.utils.records;
 
-import io.github.ctimetbukii.simpleterminal.annotations.SubCommandExecutor;
+import io.github.ctimetbukii.simpleterminal.annotations.SubcommandExecutor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
@@ -9,16 +9,16 @@ import java.lang.reflect.Parameter;
 
 public class SubExecutorInformation implements Comparable<SubExecutorInformation> {
     @Getter
-    private SubCommandExecutor executorAnn;
+    private SubcommandExecutor executorAnn;
     @Getter
     private Parameter[] parameters;
 
     public SubExecutorInformation(Method method) {
-        if (!method.isAnnotationPresent(SubCommandExecutor.class)) {
+        if (!method.isAnnotationPresent(SubcommandExecutor.class)) {
             throw new IllegalArgumentException("No @SubCommandExecutor for #" + method);
         }
 
-        executorAnn = method.getAnnotation(SubCommandExecutor.class);
+        executorAnn = method.getAnnotation(SubcommandExecutor.class);
         parameters = method.getParameters();
     }
 

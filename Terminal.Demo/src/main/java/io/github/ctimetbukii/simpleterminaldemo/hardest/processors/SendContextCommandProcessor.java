@@ -6,7 +6,7 @@ import io.github.ctimetbukii.simpleterminal.process.transform.ArgsTypeTransformM
 import java.io.PrintStream;
 
 
-@CommandProcessor(value = "send", matchUpperAndLowerCase = false, hasContext = true)
+@CommandProcessor(value = "send", matchAllCases = false, hasContext = true)
 public class SendContextCommandProcessor {
     @InjectOutPrintStream
     private PrintStream out;

@@ -8,7 +8,7 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 
 /**
- * 用于区分一个CommandExecutor标记的方法和另一个CommandExecutor标记的方法的Sign。
+ * 用于区分不同方法的Sign。
  */
 public class CommandSign {
     @Getter
@@ -23,13 +23,16 @@ public class CommandSign {
     private boolean paraJoin;
     @Getter
     private final TransformExecutor transformExecutor;
+    @Getter
+    private boolean matchAllCasesForSubcommand;
 
     public CommandSign(String[] patterns,
                        Class<?>[] paraTypes,
                        int stage,
                        boolean paraJoin,
-                       ArgsTypeTransformMethod transformMethod) {
-        this("", patterns, paraTypes, stage, paraJoin, transformMethod);
+                       ArgsTypeTransformMethod transformMethod,
+                       boolean matchAllCasesForSubcommand) {
+        this("", patterns, paraTypes, stage, paraJoin, transformMethod, matchAllCasesForSubcommand);
     }
 
     public CommandSign(String commandValue,
@@ -37,12 +40,14 @@ public class CommandSign {
                        Class<?>[] paraTypes,
                        int stage,
                        boolean paraJoin,
-                       ArgsTypeTransformMethod transformMethod) {
+                       ArgsTypeTransformMethod transformMethod,
+                       boolean matchAllCasesForSubcommand) {
         this.commandValue = commandValue;
         this.patterns = patterns;
         this.paraTypes = paraTypes;
         this.stage = stage;
         this.paraJoin = paraJoin;
+        this.matchAllCasesForSubcommand = matchAllCasesForSubcommand;
 
         switch (transformMethod) {
             case CONVERT:

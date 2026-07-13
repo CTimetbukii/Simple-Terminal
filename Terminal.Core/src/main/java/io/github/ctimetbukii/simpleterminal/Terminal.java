@@ -169,7 +169,7 @@ public class Terminal {
 
         contextLengthMap.put(processorAnn.value().toLowerCase(), contextLength);
 
-        if (processorAnn.matchUpperAndLowerCase()) {
+        if (processorAnn.matchAllCases()) {
             easeMatchCommandHandlers.put(processorAnn.value().toLowerCase(), new CommandHandler(cls, contextLength, options));
 
             for (String alias : processorAnn.alias()) {
@@ -190,7 +190,7 @@ public class Terminal {
         }
         //处理含有上下文的指令
         if (processorAnn.hasContext()) {
-            if (processorAnn.matchUpperAndLowerCase()) {
+            if (processorAnn.matchAllCases()) {
                 easeMatchCommandsWithContext.add(processorAnn.value());
             } else {
                 strictMatchCommandsWithContext.add(processorAnn.value());

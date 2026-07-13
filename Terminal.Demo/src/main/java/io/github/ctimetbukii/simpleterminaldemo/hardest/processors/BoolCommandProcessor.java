@@ -6,7 +6,7 @@ import io.github.ctimetbukii.simpleterminal.annotations.InjectOutPrintStream;
 
 import java.io.PrintStream;
 
-@CommandProcessor(value = "bool", matchUpperAndLowerCase = false)
+@CommandProcessor(value = "bool", matchAllCases = false)
 public class BoolCommandProcessor {
     @InjectOutPrintStream
     private PrintStream out;

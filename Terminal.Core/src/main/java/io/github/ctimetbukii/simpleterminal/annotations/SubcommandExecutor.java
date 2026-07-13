@@ -9,7 +9,7 @@ import java.lang.annotation.*;
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME) //TODO 支持Repeatable或者引入一种新的可以同时处理 -m -c -h 这种子命令重复的方式
-public @interface SubCommandExecutor {
+public @interface SubcommandExecutor {
     /**
      * 子命令
      */
@@ -25,7 +25,7 @@ public @interface SubCommandExecutor {
      * 例如，该值为true时，mycommand，MYCOMMAND，MyCommand，mYCOMMand等都会被@SubCommandExecutor("mycommand")匹配
      * 为false时则只有mycommand能被匹配
      */
-    boolean matchUpperAndLowerCase() default true;
+    boolean matchAllCases() default true;
 
     /**
      * 方法参数应当遵循的格式要求，使用正则表达式编写，依次按位置表示每个位置的参数格式。默认为空，即不作格式要求

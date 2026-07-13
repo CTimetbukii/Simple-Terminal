@@ -67,7 +67,7 @@ public class DefaultStopCommandProcessor {
      * 即为在200毫秒后关闭
      * @param millisDelay 延迟几毫秒
      */
-    @SubCommandExecutor(value = "-ms", descriptionKey = "simpleterminal.defaults.stop.millis")
+    @SubcommandExecutor(value = "-ms", descriptionKey = "simpleterminal.defaults.stop.millis")
     public void stopAfterMillis(@ParaDsKey("simpleterminal.defaults.stop.para.millisDelay") long millisDelay) {
         new Timer()
                 .schedule(new TimerTask() {
@@ -85,7 +85,7 @@ public class DefaultStopCommandProcessor {
      * 即为在2秒后关闭
      * @param secsDelay 延迟几秒
      */
-    @SubCommandExecutor(value = "-s", descriptionKey = "simpleterminal.defaults.stop.secs")
+    @SubcommandExecutor(value = "-s", descriptionKey = "simpleterminal.defaults.stop.secs")
     public void stopAfterSecs(@ParaDsKey("simpleterminal.defaults.stop.para.secsDelay") long secsDelay) {
         stopAfterMillis(secsDelay * 1000);
     }
@@ -96,7 +96,7 @@ public class DefaultStopCommandProcessor {
      * 即为在2分钟后关闭
      * @param minsDelay 延迟几分钟
      */
-    @SubCommandExecutor(value = "-min", descriptionKey = "simpleterminal.defaults.stop.mins")
+    @SubcommandExecutor(value = "-min", descriptionKey = "simpleterminal.defaults.stop.mins")
     public void stopAfterMins(@ParaDsKey("simpleterminal.defaults.stop.para.minsDelay") long minsDelay) {
         stopAfterSecs(minsDelay * 60);
     }
@@ -107,7 +107,7 @@ public class DefaultStopCommandProcessor {
      * 即为在2小时后关闭
      * @param hoursDelay 延迟几小时
      */
-    @SubCommandExecutor(value = "-h", descriptionKey = "simpleterminal.defaults.stop.hours")
+    @SubcommandExecutor(value = "-h", descriptionKey = "simpleterminal.defaults.stop.hours")
     public void stopAfterHours(@ParaDsKey("simpleterminal.defaults.stop.para.hoursDelay") long hoursDelay) {
         stopAfterMins(hoursDelay * 60);
     }
@@ -118,7 +118,7 @@ public class DefaultStopCommandProcessor {
      * 即为在2天后关闭
      * @param daysDelay 延迟几天
      */
-    @SubCommandExecutor(value = "-d", descriptionKey = "simpleterminal.defaults.stop.days")
+    @SubcommandExecutor(value = "-d", descriptionKey = "simpleterminal.defaults.stop.days")
     public void stopAfterDays(@ParaDsKey("simpleterminal.defaults.stop.para.daysDelay") long daysDelay) {
         stopAfterHours(daysDelay * 24);
     }
@@ -130,7 +130,7 @@ public class DefaultStopCommandProcessor {
      * 如果想要指定在几个月后的同一天关闭，请使用 stop -r 指令
      * @param monthsDelay 延迟几个月
      */
-    @SubCommandExecutor(value = "-mo", descriptionKey = "simpleterminal.defaults.stop.months")
+    @SubcommandExecutor(value = "-mo", descriptionKey = "simpleterminal.defaults.stop.months")
     public void stopAfterMonths(@ParaDsKey("simpleterminal.defaults.stop.para.monthsDelay") long monthsDelay) {
         stopAfterDays(monthsDelay * 30);
     }
@@ -141,7 +141,7 @@ public class DefaultStopCommandProcessor {
      * 即为在2年后关闭。注意，这里的延迟时间，是直接将年数乘以365算出延迟的天数，没有考虑现实中闰年时长为366天的问题。
      * 如果想要指定在几年后的同一天关闭，请使用stop -r 指令
      */
-    @SubCommandExecutor(value = "-y", descriptionKey = "simpleterminal.defaults.stop.years")
+    @SubcommandExecutor(value = "-y", descriptionKey = "simpleterminal.defaults.stop.years")
     public void stopAfterYears(@ParaDsKey("simpleterminal.defaults.stop.para.yearsDelay") long yearsDelay) {
         stopAfterDays(yearsDelay * 365);
     }
@@ -159,7 +159,7 @@ public class DefaultStopCommandProcessor {
      * <code>stop -r 2030 2 17 13 14 15 888</code>
      * 即为在2030年的2月17日的13时14分15秒888毫秒关闭。最大时间精细度只支持到毫秒<br/>
      */
-    @SubCommandExecutor(value = "-r",
+    @SubcommandExecutor(value = "-r",
             paraTransformMethod = ArgsTypeTransformMethod.COERCE_WITH_INTERPRET,
             patterns = {"-?\\d+", "^(0[1-9]|1[0-2])$", "^(0[1-9]|[12][0-9]|3[01])$"},
             descriptionKey = "simpleterminal.defaults.stop.at")
@@ -169,7 +169,7 @@ public class DefaultStopCommandProcessor {
         stopAtRealTime(targetYear, targetMon, targetDay, 0);
     }
 
-    @SubCommandExecutor(value = "-r", paraTransformMethod = ArgsTypeTransformMethod.COERCE_WITH_INTERPRET,
+    @SubcommandExecutor(value = "-r", paraTransformMethod = ArgsTypeTransformMethod.COERCE_WITH_INTERPRET,
             patterns = {"-?\\d+", "^(0[1-9]|1[0-2])$", "^(0[1-9]|[12][0-9]|3[01])$", "^([01][0-9]|2[0-3])$"},
             descriptionKey = "simpleterminal.defaults.stop.at")
     public void stopAtRealTime(@ParaDsKey("simpleterminal.defaults.stop.para.targetYear") int targetYear,
@@ -179,7 +179,7 @@ public class DefaultStopCommandProcessor {
         stopAtRealTime(targetYear, targetMon, targetDay, targetHour, 0);
     }
 
-    @SubCommandExecutor(value = "-r", paraTransformMethod = ArgsTypeTransformMethod.COERCE_WITH_INTERPRET,
+    @SubcommandExecutor(value = "-r", paraTransformMethod = ArgsTypeTransformMethod.COERCE_WITH_INTERPRET,
             patterns = {"-?\\d+", "^(0[1-9]|1[0-2])$", "^(0[1-9]|[12][0-9]|3[01])$", "^([01][0-9]|2[0-3])$", "^([0-5][0-9])$"},
             descriptionKey = "simpleterminal.defaults.stop.at")
     public void stopAtRealTime(@ParaDsKey("simpleterminal.defaults.stop.para.targetYear") int targetYear,
@@ -190,7 +190,7 @@ public class DefaultStopCommandProcessor {
         stopAtRealTime(targetYear, targetMon, targetDay, targetHour, targetMin, 0);
     }
 
-    @SubCommandExecutor(value = "-r", paraTransformMethod = ArgsTypeTransformMethod.COERCE_WITH_INTERPRET,
+    @SubcommandExecutor(value = "-r", paraTransformMethod = ArgsTypeTransformMethod.COERCE_WITH_INTERPRET,
             patterns = {"-?\\d+", "^(0[1-9]|1[0-2])$", "^(0[1-9]|[12][0-9]|3[01])$", "^([01][0-9]|2[0-3])$", "^([0-5][0-9])$", "^([0-5][0-9])$"},
             descriptionKey = "simpleterminal.defaults.stop.at")
     public void stopAtRealTime(@ParaDsKey("simpleterminal.defaults.stop.para.targetYear") int targetYear,
@@ -202,7 +202,7 @@ public class DefaultStopCommandProcessor {
         stopAtRealTime(targetYear, targetMon, targetDay, targetHour, targetMin, targetSec, 0);
     }
 
-    @SubCommandExecutor(value = "-r", paraTransformMethod = ArgsTypeTransformMethod.COERCE_WITH_INTERPRET,
+    @SubcommandExecutor(value = "-r", paraTransformMethod = ArgsTypeTransformMethod.COERCE_WITH_INTERPRET,
                         patterns = {"-?\\d+", "^(0[1-9]|1[0-2])$", "^(0[1-9]|[12][0-9]|3[01])$", "^([01][0-9]|2[0-3])$", "^([0-5][0-9])$", "^([0-5][0-9])$", "^\\d{1,3}$"},
             descriptionKey = "simpleterminal.defaults.stop.at")
     public void stopAtRealTime(@ParaDsKey("simpleterminal.defaults.stop.para.targetYear") int targetYear,

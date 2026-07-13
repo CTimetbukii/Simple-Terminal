@@ -2,14 +2,16 @@ package io.github.ctimetbukii.simpleterminal.utils.records;
 
 import io.github.ctimetbukii.simpleterminal.annotations.CommandExecutor;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 
-public class ExecutorInformation {
+public class ExecutorInformation implements Comparable<ExecutorInformation> {
     @Getter
     private CommandExecutor executorAnn;
     @Getter
-    private Class<?>[] paraTypes;
+    private Parameter[] parameters;
 
     public ExecutorInformation(Method method) {
         if (!method.isAnnotationPresent(CommandExecutor.class)) {
@@ -17,6 +19,11 @@ public class ExecutorInformation {
         }
 
         executorAnn = method.getAnnotation(CommandExecutor.class);
-        paraTypes = method.getParameterTypes();
+        parameters = method.getParameters();
+    }
+
+    @Override
+    public int compareTo(@NotNull ExecutorInformation o) {
+        return parameters.length - o.parameters.length;
     }
 }

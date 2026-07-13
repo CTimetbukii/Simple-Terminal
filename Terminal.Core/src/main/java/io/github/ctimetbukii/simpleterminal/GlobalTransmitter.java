@@ -1,5 +1,6 @@
 package io.github.ctimetbukii.simpleterminal;
 
+import io.github.ctimetbukii.simpleterminal.utils.records.CommandInformation;
 import io.github.ctimetbukii.simpleterminal.utils.records.RunnableMethod;
 import lombok.Getter;
 
@@ -14,4 +15,6 @@ public class GlobalTransmitter {
     private static final HashMap<String, Object> transmitter = new HashMap<>();
     @Getter
     private static final HashSet<RunnableMethod> closeResourceMethods = new HashSet<>();
+    @Getter
+    private static final HashMap<String, CommandInformation> commandInformationMap = new HashMap<>();
 }

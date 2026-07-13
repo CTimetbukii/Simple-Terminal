@@ -2,7 +2,6 @@ package io.github.ctimetbukii.simpleterminal.utils.records;
 
 import io.github.ctimetbukii.simpleterminal.annotations.CommandExecutor;
 import io.github.ctimetbukii.simpleterminal.annotations.CommandProcessor;
-import io.github.ctimetbukii.simpleterminal.annotations.ContextCommandExecutor;
 import io.github.ctimetbukii.simpleterminal.annotations.SubCommandExecutor;
 import lombok.Getter;
 

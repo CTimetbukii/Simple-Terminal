@@ -225,21 +225,12 @@ public class DefaultStopCommandProcessor {
                                    int targetHour, int targetMin, int targetSec,
                                    int targetMill) {
 
-        // 1. 构建目标 LocalDateTime（注意月份从1开始）
         LocalDateTime targetLdt = LocalDateTime.of(targetYear, targetMon, targetDay,
                 targetHour, targetMin, targetSec, targetMill * 1_000_000); // 毫秒转纳秒
 
-        // 2. 获取当前时间（系统默认时区）
         ZonedDateTime nowZdt = ZonedDateTime.now();
-        LocalDateTime nowLdt = nowZdt.toLocalDateTime();
 
-        // 3. 将目标时间也转为同样的时区（此处直接使用系统默认时区）
         ZonedDateTime targetZdt = targetLdt.atZone(ZoneId.systemDefault());
-
-        // 4. 判断是否在未来（isAfter 严格大于）
-        boolean isFuture = targetZdt.isAfter(nowZdt);
-
-        // 5. 计算毫秒差（精确到毫秒）
 
         return ChronoUnit.MILLIS.between(nowZdt, targetZdt);
     }

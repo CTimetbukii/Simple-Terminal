@@ -299,28 +299,6 @@ public class Terminal {
         }
     }
 
-    public Set<String> getAllCommands() {
-        Set<String> commands = new HashSet<>(easeMatchCommandHandlers.keySet());
-        commands.addAll(strictMatchCommandHandlers.keySet());
-        return commands;
-    }
-
-    public Set<String> getEaseMatchCommands() {
-        return easeMatchCommandHandlers.keySet();
-    }
-
-    public Set<String> getEaseMatchCommandsCopy() {
-        return new HashSet<>(getEaseMatchCommands());
-    }
-
-    public Set<String> getStrictMatchCommands() {
-        return strictMatchCommandHandlers.keySet();
-    }
-
-    public Set<String> getStrictMatchCommandsCopy() {
-        return new HashSet<>(getStrictMatchCommands());
-    }
-
     public void stop() {
         run = false;
         if (asyncThread != null) {

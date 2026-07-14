@@ -4,5 +4,6 @@ public enum ExecuteState {
     SUCCEED,
     FAIL,
     NEED_REPEAT,
-    STAGE_JUMP_TO
+    STAGE_JUMP_TO,
+    CONTEXT_INTERRUPT
 }

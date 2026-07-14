@@ -228,7 +228,8 @@ public class Terminal {
                         }
 
                         //检查执行结果。若执行出现参数问题，应当认为此次命令执行失败，清空上下文
-                        if (result.getExecuteState() == ExecuteState.FAIL) {
+                        if (result.getExecuteState() == ExecuteState.FAIL
+                            || result.getExecuteState() == ExecuteState.CONTEXT_INTERRUPT) {
                             contextTimes = -1;
                             contextCommand = null;
                         }
@@ -250,7 +251,11 @@ public class Terminal {
                         }
 
 
-                        options.getOutputStream().print(options.getPrompt());
+                        options.getOutputStream().flush();
+                        if (contextCommand == null
+                                || contextTimes == contextLengthMap.get(contextCommand)) { //上下文次数已经达到最大了，代表指令执行完了，可以打印prompt了
+                            options.getOutputStream().print(options.getPrompt());
+                        }
                         continue; //当前的上下文指令已经处理完，走下一次while循环，避免跳出if块后继续执行剩下代码导致同一个命令被处理两次
                     } else {
                         //上下文次数已经达到记录的最大次数。证明此时已经完成上下文命令的上下文。我们清空上下文
@@ -292,7 +297,8 @@ public class Terminal {
                     result = new ExecuteResult(ExecuteState.FAIL, -2);
                 }
 
-                if (result.getExecuteState() == ExecuteState.FAIL) {
+                if (result.getExecuteState() == ExecuteState.FAIL
+                    || result.getExecuteState() == ExecuteState.CONTEXT_INTERRUPT) {
                     contextTimes = -1;
                     contextCommand = null;
                 }
@@ -301,7 +307,9 @@ public class Terminal {
 
 
                 options.getOutputStream().flush();
-                options.getOutputStream().print(options.getPrompt());
+                if (contextCommand == null) {
+                    options.getOutputStream().print(options.getPrompt());
+                }
             }
         }
     }

@@ -326,9 +326,16 @@ public class CommandHandler {
                     return new ExecuteResult(ExecuteState.STAGE_JUMP_TO, Converter.convertToInt(returned.toString()));
                 }
             } catch (InvocationTargetException e) {
-                if (e.getCause() != null && e.getCause() instanceof NeedRepeatException){
-                    return new ExecuteResult(ExecuteState.NEED_REPEAT, -2);
+                if (e.getCause() != null){
+                    if (e.getCause() instanceof NeedRepeatException) {
+                        return new ExecuteResult(ExecuteState.NEED_REPEAT, -2);
+                    }
+
+                    if (e.getCause() instanceof ContextInterruptException) {
+                        return new ExecuteResult(ExecuteState.CONTEXT_INTERRUPT, -2);
+                    }
                 }
+
                 //noinspection CallToPrintStackTrace
                 e.printStackTrace();
                 return new ExecuteResult(ExecuteState.FAIL, -2);

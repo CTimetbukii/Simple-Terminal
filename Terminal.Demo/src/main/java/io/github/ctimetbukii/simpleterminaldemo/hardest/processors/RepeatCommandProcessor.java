@@ -25,7 +25,7 @@ public class RepeatCommandProcessor { //这个指令处理类没有implement Des
     public void repeat1(boolean repeat) {
         if (repeat) {
             out.println("Repeated. Again?");
-            throw new NeedRepeatException();
+            throw new NeedRepeatException();  //当方法中抛出NeedRepeatException时，下一轮输入的内容还会进入当前stage。只有抛出NeedRepeatException才会这样，其他Exception则正常报错
         }
         out.println("Stop. Jump to which stage OR try fail repeat by entering true/false");
     }

@@ -278,7 +278,7 @@ public class CommandHandler {
                     argsIllegalExecutor.invoke(invokeObj);
                 } else {
                     //有参数。传入一整个数组参数。参数错误命令处理器要求如果有参数，则必须是一个数组
-                    argsIllegalExecutor.invoke(invokeObj, (Object[]) args);
+                    argsIllegalExecutor.invoke(invokeObj, (Object) args);
                 }
             } else {
                 //参数错误命令处理器此时未定义，执行默认行为

@@ -3,6 +3,7 @@
 # Simple-Terminal
 
 ☕ A lightweight, simple, and easy-to-use Java terminal library
+
 🥰 Driven by annotations, equip your application with a full command-line interaction layer in minimal code
 
 </div>

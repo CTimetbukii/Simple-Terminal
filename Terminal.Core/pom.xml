@@ -8,6 +8,9 @@
     <artifactId>simple-terminal</artifactId>
     <version>1.0.0</version>
     <url>https://github.com/CTimetbukii/Simple-Terminal</url>
+    <name>Simple-Terminal</name>
+    <description>A lightweight, simple, and easy-to-use Java terminal library</description>
+
     <licenses>
         <license>
             <name>MIT License</name>

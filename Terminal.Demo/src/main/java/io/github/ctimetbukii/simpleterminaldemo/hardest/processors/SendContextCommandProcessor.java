@@ -4,6 +4,7 @@ import io.github.ctimetbukii.simpleterminal.annotations.*;
 import io.github.ctimetbukii.simpleterminal.process.transform.ArgsTypeTransformMethod;
 
 import java.io.PrintStream;
+import java.util.Arrays;
 
 
 @CommandProcessor(value = "send", matchAllCases = false, hasContext = true)
@@ -40,7 +41,8 @@ public class SendContextCommandProcessor {
     }
 
     @ArgsIllegalExecutor
-    public void fail() {
+    public void fail(String[] args) {
         out.println("参数不合法");
+        out.println(Arrays.toString(args));
     }
 }

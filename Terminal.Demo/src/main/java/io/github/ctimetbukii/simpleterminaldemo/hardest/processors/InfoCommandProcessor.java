@@ -17,10 +17,15 @@ public class InfoCommandProcessor {
         out.println("'info command' called. method#info called.");
     }
 
+    @CommandExecutor
+    public void infoStr(String str) {
+        out.println(str);
+    }
+
     /**
      * 该方法将在执行 info cpu 时触发。其中info，cpu中的任何一个或多个字母换成大写仍然可以触发。
      */
-    @SubcommandExecutor("cpu")
+    @SubcommandExecutor(value = "cpu", alias = {"@", "c"})
     public void infoCpu() {
         out.println("'info cpu' command called. method#infoCpu called.");
     }

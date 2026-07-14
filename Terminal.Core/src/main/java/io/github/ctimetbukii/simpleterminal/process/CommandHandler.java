@@ -5,10 +5,7 @@ import io.github.ctimetbukii.elegantconvertchecker.Converter;
 import io.github.ctimetbukii.simpleterminal.CommandSign;
 import io.github.ctimetbukii.simpleterminal.TerminalOptions;
 import io.github.ctimetbukii.simpleterminal.annotations.*;
-import io.github.ctimetbukii.simpleterminal.exceptions.IllegalInjectObjectException;
-import io.github.ctimetbukii.simpleterminal.exceptions.NeedRepeatException;
-import io.github.ctimetbukii.simpleterminal.exceptions.NoAccessibleNecessaryExecutor;
-import io.github.ctimetbukii.simpleterminal.exceptions.RepeatCommandSignException;
+import io.github.ctimetbukii.simpleterminal.exceptions.*;
 import io.github.ctimetbukii.simpleterminal.flags.ClosableFlag;
 import io.github.ctimetbukii.simpleterminal.utils.CastUtil;
 import io.github.ctimetbukii.simpleterminal.GlobalTransmitter;
@@ -33,6 +30,9 @@ public class CommandHandler {
 
     //子命令与Method的映射
     private final HashMap<CommandSign, Method> subCommandExecutors = new HashMap<>();
+
+    //子命令别称与子命令的映射
+    private final HashMap<String, String> subCommandAliases = new HashMap<>();
 
     //上下文命令与Method的映射
     private final HashMap<CommandSign, Method> contextCommandExecutors = new HashMap<>();
@@ -97,6 +97,15 @@ public class CommandHandler {
                 }
                 subCommandExecutors.put(sign, method);
                 accessibleNecessaryExecutor++;
+
+                //注册alias
+                for (String alias : method.getAnnotation(SubcommandExecutor.class).alias()) {
+                    if (subCommandAliases.containsKey(alias)) {
+                        throw new RepeatAliasException("Repeat alias for subcommand #" + sign.getCommandValue());
+                    }
+
+                    subCommandAliases.put(alias, sign.getCommandValue());
+                }
                 continue;
             }
 
@@ -232,7 +241,8 @@ public class CommandHandler {
             executorMap = contextCommandExecutors;
         } else if ((!subCommandExecutors.isEmpty()) && args.length != 0) { //说明存在子命令，且输入中有能够被视为子命令的东西，检查子命令匹配
             //子命令
-            String subCommand = args[0];
+            //检查是否是某个子命令的别名，如果是则名称转换
+            String subCommand = subCommandAliases.getOrDefault(args[0], args[0]);
             //检查该子命令是否被注册
             isSubCommandRegistered = subCommandExecutors.keySet().stream().anyMatch(cSign ->
                     cSign.isMatchAllCasesForSubcommand()

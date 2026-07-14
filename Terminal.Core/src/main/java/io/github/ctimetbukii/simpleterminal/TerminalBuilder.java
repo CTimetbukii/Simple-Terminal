@@ -157,6 +157,14 @@ public class TerminalBuilder {
     }
 
     /**
+     * 设置命令行提示符
+     */
+    public TerminalBuilder setPrompt(String prompt) {
+        options.setPrompt(prompt);
+        return this;
+    }
+
+    /**
      * 构造Terminal对象
      * @return Terminal 对象
      */

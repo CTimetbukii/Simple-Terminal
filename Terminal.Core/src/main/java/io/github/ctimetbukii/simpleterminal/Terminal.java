@@ -202,6 +202,7 @@ public class Terminal {
 
     private void monitorInput() {
         try (Scanner scanner = new Scanner(options.getInputStream())){
+            options.getOutputStream().print(options.getPrompt());
             while (run && !Thread.currentThread().isInterrupted() && scanner.hasNextLine()) {
                 String[] inputs = scanner.nextLine().split(" ");
 
@@ -248,6 +249,8 @@ public class Terminal {
                             }
                         }
 
+
+                        options.getOutputStream().print(options.getPrompt());
                         continue; //当前的上下文指令已经处理完，走下一次while循环，避免跳出if块后继续执行剩下代码导致同一个命令被处理两次
                     } else {
                         //上下文次数已经达到记录的最大次数。证明此时已经完成上下文命令的上下文。我们清空上下文
@@ -295,6 +298,10 @@ public class Terminal {
                 }
 
                 //普通命令或者上下文命令的stage0不做repeat处理和jumpTo处理
+
+
+                options.getOutputStream().flush();
+                options.getOutputStream().print(options.getPrompt());
             }
         }
     }

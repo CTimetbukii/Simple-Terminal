@@ -131,4 +131,11 @@ public class TerminalOptions {
     @Getter
     @Setter
     private Runnable stopRunnable;
+
+    /**
+     * 命令行提示符
+     */
+    @Getter
+    @Setter
+    private String prompt = "> ";
 }

@@ -8,7 +8,6 @@ import io.github.ctimetbukii.simpleterminal.process.CommandHandler;
 import io.github.ctimetbukii.simpleterminal.process.ExecuteResult;
 import io.github.ctimetbukii.simpleterminal.process.ExecuteState;
 import io.github.ctimetbukii.simpleterminal.utils.records.CommandInformation;
-import io.github.ctimetbukii.simpleterminal.utils.records.TransmitterKey;
 import lombok.Getter;
 import io.github.ctimetbukii.simpleterminal.annotations.CommandProcessor;
 import lombok.SneakyThrows;
@@ -94,13 +93,6 @@ public class Terminal {
             && strictMatchCommandHandlers.keySet().stream().noneMatch(key -> key.equals("stop"))) {
             registerCommandHandler(DefaultStopCommandProcessor.class);
         }
-
-
-        Set<String> allCommands = new HashSet<>();
-        allCommands.addAll(strictMatchCommandHandlers.keySet());
-        allCommands.addAll(easeMatchCommandHandlers.keySet());
-
-        GlobalTransmitter.getTransmitter().put(TransmitterKey.ALL_COMMANDS, allCommands);
 
         //检查alias与已经注册的正式命令有无冲突的
         for (String alias : aliasToEaseRawCommand.keySet()) {

@@ -33,8 +33,7 @@ public class DefaultHelpCommandProcessor {
 
     @CommandExecutor(descriptionKey = "simpleterminal.defaults.help.target")
     public void help(@ParaDsKey("simpleterminal.defaults.help.para.command") String command) {
-        @SuppressWarnings("unchecked")
-        Set<String> allCommands = (Set<String>) GlobalTransmitter.getTransmitter().get(TransmitterKey.ALL_COMMANDS);
+        Set<String> allCommands = GlobalTransmitter.getCommandInformationMap().keySet();
 
         //检查方法是否存在
         if (!allCommands.contains(command)) {
@@ -167,8 +166,7 @@ public class DefaultHelpCommandProcessor {
 
         //打印所有命令
         //先获取所有命令中，最长的那个，用那个做间隔
-        @SuppressWarnings("unchecked")
-        Set<String> allCommands = (Set<String>) GlobalTransmitter.getTransmitter().get(TransmitterKey.ALL_COMMANDS);
+        Set<String> allCommands = GlobalTransmitter.getCommandInformationMap().keySet();
         Optional<String> maxLengthCommandOptional = allCommands.stream().max(Comparator.comparingInt(String::length));
 
         int commandColumnLength = 8; //默认命令 help 和 stop 都是4个长度。再加4个做间隔，得到默认值8

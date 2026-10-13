@@ -33,7 +33,7 @@ public class DefaultStopCommandProcessor {
     public void stop() {
         out.println("Bye ~ ");
 
-        int status = -1;
+        int status = 0;
 
         //首先先关闭所有被ClosableFlag标记的
         HashSet<RunnableMethod> closeMethods = GlobalTransmitter.getCloseResourceMethods();
